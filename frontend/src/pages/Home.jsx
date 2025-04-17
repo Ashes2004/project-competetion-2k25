@@ -87,7 +87,7 @@ const Home = () => {
               </p>
             </div>
             <button className="mt-6 bg-indigo-800 hover:bg-indigo-800 text-white font-semibold py-2 px-5 rounded-lg w-fit">
-              Discover Start-ups
+              Discover booming Start-ups
             </button>
           </div>
         </div>
