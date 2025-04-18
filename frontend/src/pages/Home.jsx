@@ -62,7 +62,7 @@ const Home = () => {
           {/* Innovation Tracker */}
           <div className="bg-white rounded-2xl border border-green-800 shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-3">
+              <h2 className="text-2xl font-bold text-gray-700 mb-3">
                 Innovation Tracker
               </h2>
               <p className="text-gray-800 text-sm leading-relaxed">
@@ -87,7 +87,7 @@ const Home = () => {
               </p>
             </div>
             <button className="mt-6 bg-indigo-800 hover:bg-indigo-800 text-white font-semibold py-2 px-5 rounded-lg w-fit">
-              Discover Start-ups
+              Discover booming Start-ups
             </button>
           </div>
         </div>
