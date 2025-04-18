@@ -1,10 +1,16 @@
 from flask import Flask
+from flask_cors import CORS
+from routes.startup import startup_bp
+from routes.user import user_bp
 
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
+    CORS(app)  # Allow cross-origin requests
 
-@app.route('/')
-def home():
-    return jsonify({"message": "Hello, World!"})
+    app.register_blueprint(startup_bp)
+    app.register_blueprint(user_bp)
+    return app
 
-if __name__=="__main__":
+if __name__ == "__main__":
+    app = create_app()
     app.run(debug=True)
