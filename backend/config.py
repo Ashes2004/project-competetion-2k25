@@ -1,7 +1,9 @@
 import os
 from dotenv import load_dotenv
-
+from urllib.parse import quote_plus
 load_dotenv()
+
+DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD"))  # URL-encode the password
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")

@@ -1,16 +1,17 @@
-from sqlalchemy import Column, Integer, String, Text, Date, Numeric, TIMESTAMP, func, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Date, TIMESTAMP, ForeignKey
 from database import Base
 
 class Startup(Base):
-    __tablename__ = "startups"
+    __tablename__ = "startup"
+    __table_args__ = {"schema": "CMS"}
 
-    startup_id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(255), nullable=False)
-    description = Column(Text)
-    founder = Column(String(255))
-    industry = Column(String(100))
-    founded_date = Column(Date)
-    status = Column(String(50))
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-    updated_at = Column(TIMESTAMP(timezone=True), onupdate=func.now())
-    user_id = Column(Numeric, ForeignKey("users.id"))
+    startup_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    name = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    founder = Column(String, nullable=True)
+    industry = Column(String, nullable=True)
+    founded_date = Column(Date, nullable=True)
+    status = Column(String, nullable=True)
+    created_at = Column(TIMESTAMP, nullable=True)
+    updated_at = Column(TIMESTAMP, nullable=True)
+    user_id = Column(Integer, ForeignKey("CMS.users.user_id"), nullable=True)

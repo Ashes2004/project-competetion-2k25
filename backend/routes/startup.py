@@ -15,17 +15,18 @@ def get_db():
     finally:
         db.close()
 
-# Admin: view all startups
+# Admin or User: View startups
 @startup_bp.route("/", methods=["GET"])
 @token_required
 def get_all_startups():
     db = next(get_db())
-    role = request.user_role
-    user_id = request.user.id
+    role = request.user["role"]  # Accessing user role from the updated user dictionary
+    user_id = request.user["id"]  # Accessing user ID from the updated user dictionary
 
     if role == "admin":
-        startups = db.query(Startup).all()
+        startups = db.query(Startup).all()  # Admin can view all startups
     else:
+        # Show only the startups created by the authenticated user
         startups = db.query(Startup).filter(Startup.user_id == user_id).all()
 
     return jsonify([{
@@ -40,12 +41,12 @@ def get_all_startups():
     } for s in startups])
 
 # Add startup
-@startup_bp.route("/", methods=["POST"])
+@startup_bp.route("/add-startup", methods=["POST"])
 @token_required
 def add_startup():
     db = next(get_db())
     data = request.json
-    user_id = request.user.id
+    user_id = request.user["id"]  # Accessing user ID from the updated user dictionary
 
     new_startup = Startup(
         name=data.get("name"),
@@ -63,23 +64,31 @@ def add_startup():
     return jsonify({"message": "Startup created", "startup_id": new_startup.startup_id})
 
 # Update startup
-@startup_bp.route("/<int:startup_id>", methods=["PUT"])
+@startup_bp.route("/update-startup/<int:startup_id>", methods=["PUT"])
 @token_required
 def update_startup(startup_id):
     db = next(get_db())
-    user_id = request.user.id
-    role = request.user_role
+    user_id = request.user["id"]
+    role = request.user["role"]
+    print(user_id, role)
 
     startup = db.query(Startup).filter(Startup.startup_id == startup_id).first()
     if not startup:
         return jsonify({"error": "Startup not found"}), 404
 
+    # Only admin or the owner of the startup can update it
     if role != "admin" and startup.user_id != user_id:
         return jsonify({"error": "Unauthorized"}), 403
 
     data = request.json
+    print(data)
+    allowed_fields = ["name", "description", "founder", "industry", "founded_date", "status"]
     for key, value in data.items():
-        setattr(startup, key, value)
+        if key in allowed_fields:
+            setattr(startup, key, value)
+        else:
+            return jsonify({"error": f"Invalid Field - Cannot update: {key}"}), 400
+
     db.commit()
     db.refresh(startup)
 
