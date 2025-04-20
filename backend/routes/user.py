@@ -15,7 +15,6 @@ def get_db():
     finally:
         db.close()
 
-# Sign Up Route
 @user_bp.route("/signup", methods=["POST"])
 def signup():
     data = request.json
@@ -25,22 +24,23 @@ def signup():
     role = data.get("role", "user")  # Default to 'user' if no role is provided
 
     try:
-        # Check if the user already exists in the local DB
         db = next(get_db())
+        # Check if the user already exists in the local database
         if db.query(User).filter_by(email=email).first():
             return jsonify({"error": "User already exists, Kindly Login"}), 400
 
         # Sign up with Supabase
-        response = supabase.auth.sign_up({
-            "email": email,
-            "password": password
-        })
+        try:
+            response = supabase.auth.sign_up({
+                "email": email,
+                "password": password
+            })
+        except Exception as e:
+            return jsonify({"error": f"Supabase signup failed: {str(e)}"}), 400
 
-        # Check for errors in the Supabase response
-        if response.error:
-            return jsonify({"error": response.error.message}), 400
+        if not response.user:
+            return jsonify({"error": "Signup failed. No user returned."}), 400
 
-        # Add the new user to your local database after successful signup
         new_user = User(email=email, name=name, role=role)
         db.add(new_user)
         db.commit()
