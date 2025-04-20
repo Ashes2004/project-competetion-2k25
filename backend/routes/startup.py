@@ -95,7 +95,7 @@ def update_startup(startup_id):
     return jsonify({"message": "Startup updated"})
 
 # Delete startup (Admin only)
-@startup_bp.route("/<int:startup_id>", methods=["DELETE"])
+@startup_bp.route("/delete-startup/<int:startup_id>", methods=["DELETE"])
 @token_required
 @role_required("admin")
 def delete_startup(startup_id):
