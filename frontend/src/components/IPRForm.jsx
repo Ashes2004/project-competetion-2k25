@@ -34,15 +34,43 @@ const IPRForm = ({ onSubmit, editingIPR }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow">
-      <input type="text" name="ipr_type" placeholder="IPR Type" className="input" value={form.ipr_type} onChange={handleChange} required />
-      <input type="text" name="title" placeholder="Title" className="input" value={form.title} onChange={handleChange} required />
-      <input type="text" name="ipr_number" placeholder="IPR Number" className="input" value={form.ipr_number} onChange={handleChange} />
-      <input type="date" name="filing_date" className="input" value={form.filing_date} onChange={handleChange} />
-      <input type="text" name="status" placeholder="Status" className="input" value={form.status} onChange={handleChange} />
-      <input type="number" name="related_startup_id" placeholder="Related Startup ID" className="input" value={form.related_startup_id} onChange={handleChange} />
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-xl space-y-6 border border-gray-200"
+    >
+      <h2 className="text-2xl font-semibold text-gray-800 text-center">
+        {editingIPR ? "Edit IPR Details" : "Add New IPR"}
+      </h2>
 
-      <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+      {[
+        { name: "ipr_type", label: "IPR Type", type: "text" },
+        { name: "title", label: "Title", type: "text" },
+        { name: "ipr_number", label: "IPR Number", type: "text" },
+        { name: "filing_date", label: "Filing Date", type: "date" },
+        { name: "status", label: "Status", type: "text" },
+        { name: "related_startup_id", label: "Related Startup ID", type: "number" },
+      ].map(({ name, label, type }) => (
+        <div key={name}>
+          <label htmlFor={name} className="block text-sm font-medium text-gray-600 mb-1">
+            {label}
+          </label>
+          <input
+            type={type}
+            id={name}
+            name={name}
+            placeholder={label}
+            value={form[name]}
+            onChange={handleChange}
+            required={name === "ipr_type" || name === "title"}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+          />
+        </div>
+      ))}
+
+      <button
+        type="submit"
+        className="w-full py-2 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold shadow hover:shadow-lg transition duration-300 hover:from-blue-700 hover:to-indigo-700"
+      >
         {editingIPR ? "Update IPR" : "Add IPR"}
       </button>
     </form>
