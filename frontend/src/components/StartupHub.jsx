@@ -10,63 +10,98 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-// Sample data for startups
-const startupData = [
-  {
-    id: 1,
-    name: "TechSolve",
-    domain: "SaaS",
-    stage: "MVP",
-    description: "AI-powered business analytics platform",
-    website: "techsolve.io",
-    team: 4,
-    fundingGoal: 500000,
-    fundingRaised: 200000,
-    techStack: ["React", "Node.js", "TensorFlow", "flask", "PostgreSQL"],
-    mentors: [{ name: "Dr. X", expertise: "AI/ML", status: "In Progress" }],
-    monthlyVisitors: [1000, 1500, 2000, 2800, 3200],
-    milestonesAchieved: 3,
-    milestonesTotal: 5,
-    resources: [
-      { type: "Funding", amount: "₹2,00,000", status: "Approved" },
-      { type: "Mentorship", mentor: "Dr. X (AI/ML)", status: "In Progress" },
-      { type: "Office Space", location: "Tech Hub", status: "Pending" },
-      {
-        type: "Legal Support",
-        provider: "LegalEase Inc.",
-        status: "Available",
+// API service for startup data
+const API_BASE_URL = "https://riise.koyeb.app";
+
+// Function to get authentication token - implement according to your auth system
+const getAuthToken = () => {
+  return localStorage.getItem('authToken'); // Assuming token is stored in localStorage
+};
+
+// API functions
+const fetchStartups = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/startups/`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch startups');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching startups:', error);
+    return [];
+  }
+};
+
+const addStartup = async (startupData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/startups/add-startup`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+        'Content-Type': 'application/json'
       },
-    ],
-  },
-  {
-    id: 2,
-    name: "GreenMobility",
-    domain: "Transportation",
-    stage: "Prototype",
-    description: "Electric vehicle sharing platform",
-    website: "greenmobility.co",
-    team: 3,
-    fundingGoal: 300000,
-    fundingRaised: 50000,
-    techStack: ["Flutter", "Firebase", "Python"],
-    mentors: [
-      { name: "Sarah L.", expertise: "Sustainability", status: "Approved" },
-    ],
-    monthlyVisitors: [500, 800, 1200],
-    milestonesAchieved: 2,
-    milestonesTotal: 6,
-    resources: [
-      { type: "Funding", amount: "₹50,000", status: "In Progress" },
-      {
-        type: "Mentorship",
-        mentor: "Sarah L. (Sustainability)",
-        status: "Approved",
+      body: JSON.stringify(startupData)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to add startup');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error adding startup:', error);
+    throw error;
+  }
+};
+
+const updateStartup = async (startupId, startupData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/startups/update-startup/${startupId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+        'Content-Type': 'application/json'
       },
-      { type: "Office Space", location: "Green Hub", status: "Approved" },
-      { type: "Legal Support", provider: "EcoLaw Ltd.", status: "Pending" },
-    ],
-  },
-];
+      body: JSON.stringify(startupData)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update startup');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating startup:', error);
+    throw error;
+  }
+};
+
+const deleteStartup = async (startupId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/startups/delete-startup/${startupId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to delete startup');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting startup:', error);
+    throw error;
+  }
+};
 
 // Card for displaying startup information
 const StartupCard = ({ startup, onView }) => {
@@ -269,7 +304,7 @@ const ProgressCircle = ({ achieved, total, title }) => {
   );
 };
 
-// Remove the existing AddStartupModal component and add this one
+// Updated AddStartupModal component to work with the API
 const AddStartupModal = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -286,6 +321,8 @@ const AddStartupModal = ({ isOpen, onClose, onSubmit }) => {
     milestonesTotal: 5,
     resources: []
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -303,13 +340,23 @@ const AddStartupModal = ({ isOpen, onClose, onSubmit }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit({
-      ...formData,
-      id: Date.now()
-    });
-    onClose();
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      const result = await onSubmit({
+        ...formData,
+        id: Date.now() // This will likely be overridden by the server
+      });
+      
+      onClose();
+    } catch (error) {
+      setError('Failed to add startup. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -323,6 +370,12 @@ const AddStartupModal = ({ isOpen, onClose, onSubmit }) => {
             <X size={20} />
           </button>
         </div>
+
+        {error && (
+          <div className="mb-4 p-2 bg-red-100 text-red-700 rounded-md">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -409,14 +462,16 @@ const AddStartupModal = ({ isOpen, onClose, onSubmit }) => {
               type="button"
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type="submit"
               className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700"
+              disabled={isSubmitting}
             >
-              Add Startup
+              {isSubmitting ? "Adding..." : "Add Startup"}
             </button>
           </div>
         </form>
@@ -428,37 +483,67 @@ const AddStartupModal = ({ isOpen, onClose, onSubmit }) => {
 function StartupHub() {
   const navigate = useNavigate();
   const { startupId } = useParams();
+  const [startups, setStartups] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedStartup, setSelectedStartup] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const handleAddStartup = (newStartup) => {
-    // Add logic to handle new startup
-    console.log('New startup:', newStartup);
-    setShowAddModal(false);
+  // Fetch startups from API
+  useEffect(() => {
+    const getStartups = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchStartups();
+        setStartups(data);
+        setError(null);
+      } catch (err) {
+        setError('Failed to load startups. Please try again later.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    getStartups();
+  }, []);
+
+  // Handle adding a new startup
+  const handleAddStartup = async (newStartup) => {
+    try {
+      const addedStartup = await addStartup(newStartup);
+      setStartups(prevStartups => [...prevStartups, addedStartup]);
+      return addedStartup;
+    } catch (error) {
+      console.error('Error in handleAddStartup:', error);
+      throw error;
+    }
   };
 
+  // Load selected startup from URL param
   useEffect(() => {
-    if (startupId) {
-      const startup = startupData.find((s) => s.id === parseInt(startupId));
+    if (startupId && startups.length > 0) {
+      const startup = startups.find((s) => s.id === parseInt(startupId));
       if (startup) {
         setSelectedStartup(startup);
       }
     }
-  }, [startupId]);
+  }, [startupId, startups]);
   
-  
+  // View startup details
   const viewStartup = (id) => {
-    const startup = startupData.find((s) => s.id === id);
+    const startup = startups.find((s) => s.id === id);
     setSelectedStartup(startup);
-    navigate(`/startup-hub/${id}`); // Add this line to update the URL
+    navigate(`/startup-hub/${id}`);
   };
 
+  // Close startup details view
   const closeDetails = () => {
     setSelectedStartup(null);
-    navigate("/startup-hub"); // Add this line to return to the main dashboard
+    navigate("/startup-hub");
   };
 
   const profileRef = useRef(null);
@@ -478,6 +563,46 @@ function StartupHub() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Handle API loading states
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading startups...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle API errors
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+          <h2 className="text-xl font-semibold text-red-600 mb-4">Error</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate total funding for all startups
+  const totalFunding = startups.reduce(
+    (sum, startup) => sum + startup.fundingRaised, 0
+  );
+
+  // Count total mentors across all startups
+  const totalMentors = startups.reduce(
+    (count, startup) => count + (startup.mentors?.length || 0), 0
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -605,7 +730,9 @@ function StartupHub() {
                     <div className="mt-4 flex items-center">
                       <ExternalLink size={16} className="text-gray-500 mr-2" />
                       <a
-                        href="#"
+                        href={`https://${selectedStartup.website}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-indigo-600 hover:text-indigo-800"
                       >
                         {selectedStartup.website}
@@ -693,13 +820,19 @@ function StartupHub() {
                       </div>
                       <div className="mt-4 text-sm text-gray-600">
                         {Math.round(
-                          (selectedStartup.fundingRaised /
-                            selectedStartup.fundingGoal) *
-                            100
-                        )}
-                        % of funding goal reached
+                          (selectedStartup.fundingRaised / selectedStartup.fundingGoal) * 100
+                        )}% of funding goal reached
                       </div>
                     </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      Team
+                    </h3>
+                    <p className="text-gray-600">
+                      {selectedStartup.team} team members
+                    </p>
                   </div>
                 </div>
               </div>
@@ -707,33 +840,99 @@ function StartupHub() {
           </div>
         ) : (
           <>
-            {/* Dashboard Overview */}
-            <div className="mb-8 md:flex md:items-center md:justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  My Startups
-                </h1>
-                <p className="mt-1 text-sm text-gray-500">
-                  Manage and track all your startup ventures in one place
-                </p>
-              </div>
-              <div className="mt-4 md:mt-0">
-                <button
-                  onClick={() => setShowAddModal(true)}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none"
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add Startup
-                </button>
+            {/* Dashboard Summary */}
+            <div className="mb-8">
+              <h1 className="text-2xl font-bold text-gray-900 mb-6">
+                Startup Dashboard
+              </h1>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Total Startups */}
+                <div className="bg-white rounded-lg shadow px-6 py-5">
+                  <div className="flex items-center">
+                    <div className="p-3 rounded-full bg-indigo-100 text-indigo-600">
+                      <TrendingUp size={24} />
+                    </div>
+                    <div className="ml-5">
+                      <p className="text-sm font-medium text-gray-500">
+                        Total Startups
+                      </p>
+                      <p className="text-2xl font-semibold text-gray-900">
+                        {startups.length}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Total Funding */}
+                <div className="bg-white rounded-lg shadow px-6 py-5">
+                  <div className="flex items-center">
+                    <div className="p-3 rounded-full bg-green-100 text-green-600">
+                      <DollarSign size={24} />
+                    </div>
+                    <div className="ml-5">
+                      <p className="text-sm font-medium text-gray-500">
+                        Total Funding
+                      </p>
+                      <p className="text-2xl font-semibold text-gray-900">
+                        ₹{(totalFunding / 1000).toLocaleString()}K
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mentors */}
+                <div className="bg-white rounded-lg shadow px-6 py-5">
+                  <div className="flex items-center">
+                    <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+                      <Users size={24} />
+                    </div>
+                    <div className="ml-5">
+                      <p className="text-sm font-medium text-gray-500">
+                        Total Mentors
+                      </p>
+                      <p className="text-2xl font-semibold text-gray-900">
+                        {totalMentors}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Add New Button */}
+                <div className="bg-white rounded-lg shadow px-6 py-5 flex justify-center items-center">
+                  <button
+                    onClick={() => setShowAddModal(true)}
+                    className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+                  >
+                    <PlusCircle size={20} />
+                    <span>Add New Startup</span>
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Main Grid */}
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-              <div className="lg:col-span-2 space-y-8">
-                {/* Startup Cards Grid */}
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  {startupData.map((startup) => (
+            {/* Startups List */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Your Startups
+              </h2>
+
+              {startups.length === 0 ? (
+                <div className="bg-white shadow rounded-lg py-8 px-6 text-center">
+                  <p className="text-gray-600 mb-4">
+                    You don't have any startups yet. Add your first startup to get started!
+                  </p>
+                  <button
+                    onClick={() => setShowAddModal(true)}
+                    className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+                  >
+                    <PlusCircle size={20} />
+                    <span>Add New Startup</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {startups.map((startup) => (
                     <StartupCard
                       key={startup.id}
                       startup={startup}
@@ -741,119 +940,18 @@ function StartupHub() {
                     />
                   ))}
                 </div>
-
-                {/* Overall Progress Section */}
-                <div>
-                  <h2 className="text-lg font-medium text-gray-900 mb-4">
-                    Overall Progress
-                  </h2>
-                  <div className="bg-white rounded-lg shadow p-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <div className="p-4 bg-indigo-50 rounded-lg">
-                        <h3 className="text-sm font-medium text-indigo-800 mb-1">
-                          Total Startups
-                        </h3>
-                        <p className="text-2xl font-bold text-indigo-900">
-                          {startupData.length}
-                        </p>
-                      </div>
-                      <div className="p-4 bg-green-50 rounded-lg">
-                        <h3 className="text-sm font-medium text-green-800 mb-1">
-                          Active Projects
-                        </h3>
-                        <p className="text-2xl font-bold text-green-900">
-                          {startupData.length}
-                        </p>
-                      </div>
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <h3 className="text-sm font-medium text-blue-800 mb-1">
-                          Total Funding
-                        </h3>
-                        <p className="text-2xl font-bold text-blue-900">
-                          ₹
-                          {startupData.reduce(
-                            (sum, startup) => sum + startup.fundingRaised,
-                            0
-                          ) / 1000}
-                          K
-                        </p>
-                      </div>
-                      <div className="p-4 bg-purple-50 rounded-lg">
-                        <h3 className="text-sm font-medium text-purple-800 mb-1">
-                          Mentors
-                        </h3>
-                        <p className="text-2xl font-bold text-purple-900">2</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Sidebar */}
-              <div className="space-y-8">
-                {/* Recent Activity Section */}
-                <div>
-                  <h2 className="text-lg font-medium text-gray-900 mb-4">
-                    Recent Activity
-                  </h2>
-                  <div className="bg-white shadow rounded-lg divide-y divide-gray-200">
-                    <div className="p-4">
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                            <DollarSign size={16} className="text-blue-600" />
-                          </div>
-                        </div>
-                        <div className="ml-3">
-                          <p className="text-sm font-medium text-gray-900">
-                            New funding received for TechSolve
-                          </p>
-                          <p className="text-xs text-gray-500">2 days ago</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                          <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-                            <TrendingUp size={16} className="text-green-600" />
-                          </div>
-                        </div>
-                        <div className="ml-3">
-                          <p className="text-sm font-medium text-gray-900">
-                            GreenMobility reached prototype stage
-                          </p>
-                          <p className="text-xs text-gray-500">4 days ago</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                          <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <Users size={16} className="text-indigo-600" />
-                          </div>
-                        </div>
-                        <div className="ml-3">
-                          <p className="text-sm font-medium text-gray-900">
-                            New team member added to TechSolve
-                          </p>
-                          <p className="text-xs text-gray-500">1 week ago</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </>
         )}
-        <AddStartupModal
-          isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          onSubmit={handleAddStartup}
-        />
       </div>
+
+      {/* Add Startup Modal */}
+      <AddStartupModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSubmit={handleAddStartup}
+      />
     </div>
   );
 }
