@@ -67,6 +67,7 @@ const AuthToggler = () => {
         setMessage(data.error || "Something went wrong");
       } else {
         setMessage(data.message);
+        sessionStorage.setItem("userEmail", data.user.email);
         navigate('/');
         console.log("Response:", data);
        
