@@ -36,7 +36,6 @@ const Navbar = () => {
             alt="Riise Logo"
             className="h-20 w-20 object-contain"
           />
-         
         </Link>
 
         {/* Mobile menu toggle */}
@@ -60,7 +59,7 @@ const Navbar = () => {
           <Link to="/innovation" className="text-gray-300 hover:text-blue-500">
             Innovation
           </Link>
-          <Link to="/startup" className="text-gray-300 hover:text-blue-500">
+          <Link to="/startup-hub" className="text-gray-300 hover:text-blue-500">
             Start-up
           </Link>
           <Link to="/about" className="text-gray-300 hover:text-blue-500">
@@ -100,19 +99,31 @@ const Navbar = () => {
       {/* Mobile menu */}
       {isOpen && (
         <div className="md:hidden mt-4 px-4 space-y-3">
-          <Link to="/#research" className="block text-gray-300 hover:text-blue-500">
+          <Link
+            to="/#research"
+            className="block text-gray-300 hover:text-blue-500"
+          >
             Research
           </Link>
           <Link to="/#ipr" className="block text-gray-300 hover:text-blue-500">
             IPR
           </Link>
-          <Link to="/#innovation" className="block text-gray-300 hover:text-blue-500">
+          <Link
+            to="/#innovation"
+            className="block text-gray-300 hover:text-blue-500"
+          >
             Innovation
           </Link>
-          <Link to="/#startup" className="block text-gray-300 hover:text-blue-500">
+          <Link
+            to="/#startup"
+            className="block text-gray-300 hover:text-blue-500"
+          >
             Start-up
           </Link>
-          <Link to="/#about" className="block text-gray-300 hover:text-blue-500">
+          <Link
+            to="/#about"
+            className="block text-gray-300 hover:text-blue-500"
+          >
             About Us
           </Link>
 
