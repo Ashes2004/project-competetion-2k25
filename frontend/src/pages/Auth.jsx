@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import { Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const AuthToggler = () => {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -12,7 +13,7 @@ const AuthToggler = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
+  const navigate = useNavigate();
   const toggleAuth = () => {
     setIsSignIn(!isSignIn);
     setMessage("");
@@ -66,9 +67,11 @@ const AuthToggler = () => {
         setMessage(data.error || "Something went wrong");
       } else {
         setMessage(data.message);
+        navigate('/');
         console.log("Response:", data);
        
       }
+      
     } catch (error) {
       setMessage("Failed to connect to the server.");
     }
