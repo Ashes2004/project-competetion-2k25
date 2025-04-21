@@ -6,6 +6,7 @@ import AuthToggler from "./pages/Auth";
 import Research from "./pages/Research";
 import InnovationTracking from "./pages/InnovationTracking";
 import IPR from "./pages/IPR";
+import ResearchForm from "./pages/ResearchForm";
 
 
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/startup-hub/:startupId" element={<StartupHub />} />
 
         <Route path="/research" element = {<Research/>}/>
+        <Route path="/research/form" element={<ResearchForm/>} />
         <Route path="/ipr" element = {<IPR/>}/>
 
       </Routes>

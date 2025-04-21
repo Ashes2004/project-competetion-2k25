@@ -54,16 +54,16 @@ const Navbar = () => {
           <Link to="/research" className="text-gray-300 hover:text-blue-500">
             Research
           </Link>
-          <Link to="/#ipr" className="text-gray-300 hover:text-blue-500">
+          <Link to="/ipr" className="text-gray-300 hover:text-blue-500">
             IPR
           </Link>
-          <Link to="/#innovation" className="text-gray-300 hover:text-blue-500">
+          <Link to="/innovation" className="text-gray-300 hover:text-blue-500">
             Innovation
           </Link>
-          <Link to="/#startup" className="text-gray-300 hover:text-blue-500">
+          <Link to="/startup" className="text-gray-300 hover:text-blue-500">
             Start-up
           </Link>
-          <Link to="/#about" className="text-gray-300 hover:text-blue-500">
+          <Link to="/about" className="text-gray-300 hover:text-blue-500">
             About Us
           </Link>
 
