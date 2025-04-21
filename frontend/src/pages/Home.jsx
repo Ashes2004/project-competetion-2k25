@@ -26,9 +26,10 @@ const Home = () => {
           </div>
         </section>
       </div>
-      <section className="container w-screen  px-6 py-12">
+
+      {/* <section className="container w-screen  px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mx-36">
-          {/* Research Projects */}
+      
           <div className="bg-white rounded-2xl shadow-lg border border-red-400 p-8 flex flex-col justify-between hover:shadow-2xl transition">
             <div>
               <h2 className="text-2xl font-bold text-gray-800 mb-3">
@@ -44,7 +45,7 @@ const Home = () => {
             </button>
           </div>
 
-          {/* IPR Management */}
+         
           <div className="bg-white rounded-2xl border border-purple-800 shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition">
             <div>
               <h2 className="text-2xl font-bold text-gray-800 mb-3">
@@ -59,10 +60,10 @@ const Home = () => {
             </button>
           </div>
 
-          {/* Innovation Tracker */}
+          
           <div className="bg-white rounded-2xl border border-green-800 shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-3">
+              <h2 className="text-2xl font-bold text-gray-700 mb-3">
                 Innovation Tracker
               </h2>
               <p className="text-gray-800 text-sm leading-relaxed">
@@ -75,7 +76,6 @@ const Home = () => {
             </button>
           </div>
 
-          {/* Start-up Hub */}
           <div className="bg-white rounded-2xl border border-yellow-800 shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition">
             <div>
               <h2 className="text-2xl font-bold text-gray-800 mb-3">
@@ -87,13 +87,68 @@ const Home = () => {
               </p>
             </div>
             <button className="mt-6 bg-indigo-800 hover:bg-indigo-800 text-white font-semibold py-2 px-5 rounded-lg w-fit">
-              Discover Start-ups
+              Discover booming Start-ups
             </button>
+          </div>
+        </div>
+      </section>  */}
+      <h2 className="text-3xl text-gray-800 text-bold text-center p-6 underline">Our Services</h2>
+
+      <section className="container w-screen px-6 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mx-36">
+          {/* Research Projects Card */}
+          <div className="bg-white rounded-2xl shadow-lg border border-red-400 p-8 flex flex-col justify-between hover:shadow-2xl transition">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-3">
+                Research Projects
+              </h2>
+              <p className="text-gray-800 text-sm leading-relaxed">
+                Track ongoing research initiatives, key details, and
+                collaborations.
+              </p>
+            </div>
+          </div>
+
+          {/* IPR Management Card */}
+          <div className="bg-white rounded-2xl border border-purple-800 shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-3">
+                IPR Management
+              </h2>
+              <p className="text-gray-800 text-sm leading-relaxed">
+                Manage patent filings and track their status efficiently.
+              </p>
+            </div>
+          </div>
+
+          {/* Innovation Tracker Card */}
+          <div className="bg-white rounded-2xl border border-green-800 shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-700 mb-3">
+                Innovation Tracker
+              </h2>
+              <p className="text-gray-800 text-sm leading-relaxed">
+                Discover and learn about the impactful innovations emerging from
+                our ecosystem.
+              </p>
+            </div>
+          </div>
+
+          {/* Start-up Hub Card */}
+          <div className="bg-white rounded-2xl border border-yellow-800 shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-3">
+                Start-up Hub
+              </h2>
+              <p className="text-gray-800 text-sm leading-relaxed">
+                Connect with and learn about the exciting start-ups being
+                nurtured here.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/*about us section*/}
       <section
         id="about"
         className="container mx-auto px-6 py-16 bg-gradient-to-br from-blue-50 to-gray-100 "
