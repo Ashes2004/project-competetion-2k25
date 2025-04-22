@@ -4,10 +4,9 @@ import Home from "./pages/Home";
 import StartupHub from "./components/StartupHub";
 import AuthToggler from "./pages/Auth";
 import Research from "./pages/Research";
-import Innovation from "./pages/InnovationTracking";
-import IPR from "./pages/IPR";
-import ResearchForm from "./pages/ResearchForm";
 
+import ResearchForm from "./pages/ResearchForm";
+import IPRDashboard from "./pages/IPR"
 
 
 function App() {
@@ -26,7 +25,7 @@ function App() {
 
         <Route path="/research" element = {<Research/>}/>
         <Route path="/research/form" element={<ResearchForm/>} />
-        <Route path="/ipr" element = {<IPR/>}/>
+        <Route path="/ipr" element = {<IPRDashboard/>}/>
 
       </Routes>
     </Router>
