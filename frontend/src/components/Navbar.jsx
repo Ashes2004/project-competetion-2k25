@@ -59,7 +59,7 @@ const Navbar = () => {
           <Link to="/innovation" className="text-gray-300 hover:text-blue-500">
             Innovation
           </Link>
-          <Link to="/startup-hub" className="text-gray-300 hover:text-blue-500">
+          <Link to="/startups" className="text-gray-300 hover:text-blue-500">
             Start-up
           </Link>
           <Link to="/about" className="text-gray-300 hover:text-blue-500">

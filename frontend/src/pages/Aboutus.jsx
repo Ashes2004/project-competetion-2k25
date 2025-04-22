@@ -10,34 +10,35 @@ export default function Aboutus() {
     {
       name: "Atul Singh Chauhan",
       role: "Backend Developer",
-      bio: "With over 15 years of experience in technology innovation management, Dr. Mehta contributes to building user-friendly interfaces and ensuring the platform's responsiveness.",
+      bio: "A passionate backend developer and problem solver, Atul ensures smooth database integration and efficient server-side logic for our project.",
     },
     {
-      name: "Ashes ",
+      name: "Ashes",
       role: "Frontend Developer",
-      bio: "Priya specializes in designing intuitive interfaces, working closely with UX teams to deliver seamless user experiences.",
+      bio: "Ashes is a creative frontend enthusiast who focuses on building user-friendly and responsive interfaces using modern web technologies.",
     },
     {
       name: "Ankur Goswami",
       role: "Backend Developer",
-      bio: "Arjun brings expertise in server-side development and database management, ensuring robust performance and security.",
+      bio: "Ankur specializes in building robust backend systems and APIs. He contributes to making the system scalable and secure for users.",
     },
     {
-      name: "Aniket Ghsoh",
+      name: "Aniket Ghosh",
       role: "Frontend Developer",
-      bio: "Anisha focuses on crafting scalable and maintainable UI components using modern frontend technologies.",
+      bio: "Aniket is passionate about clean UI/UX design and development. He works on creating visually appealing and accessible interfaces.",
     },
     {
       name: "Arindam Das",
       role: "Frontend Developer",
-      bio: "Vikram leads the backend team, architecting APIs and integrating complex systems for smooth operation.",
+      bio: "Arindam focuses on responsive design and seamless interaction, making sure our platform delivers a smooth user experience.",
     },
     {
       name: "Pragya",
       role: "Frontend Developer",
-      bio: "With a keen eye for design and functionality, Meena ensures consistent frontend development across all modules.",
+      bio: "Pragya brings creativity and attention to detail to the team, designing components that align with both function and aesthetics.",
     },
   ];
+
 
   return (
     <div className="min-h-screen bg-gray-50">

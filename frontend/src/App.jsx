@@ -21,8 +21,8 @@ function App() {
         
         <Route path="/innovation-tracking" element={< InnovationTracking/>} />
         
-        <Route path="/startup-hub" element={<StartupHub />} />
-        <Route path="/startup-hub/:startupId" element={<StartupHub />} />
+        <Route path="/startups" element={<StartupHub />} />
+        <Route path="/startups/:startupId" element={<StartupHub />} />
 
         <Route path="/research" element = {<Research/>}/>
         <Route path="/research/form" element={<ResearchForm/>} />

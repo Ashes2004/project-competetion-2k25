@@ -6,25 +6,30 @@ import {
   TrendingUp,
   Users,
   ChevronRight,
-  Trash2,
   Edit,
+  Eye,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 
 // API service for startup data
 const API_BASE_URL = "https://riise.koyeb.app";
 
-// API functions
+// Enhanced API functions with better error handling
 const fetchStartups = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/v1/startups/`, {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch startups");
+      const errorText = await response.text();
+      console.error("Server error response:", errorText);
+      throw new Error(
+        `Failed to fetch startups: ${response.status} ${response.statusText}`
+      );
     }
 
     return await response.json();
@@ -43,12 +48,17 @@ const addStartup = async (startupData) => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(startupData),
       }
     );
 
     if (!response.ok) {
-      throw new Error("Failed to add startup");
+      const errorText = await response.text();
+      console.error("Server error response:", errorText);
+      throw new Error(
+        `Failed to add startup: ${response.status} ${response.statusText}`
+      );
     }
 
     return await response.json();
@@ -60,53 +70,169 @@ const addStartup = async (startupData) => {
 
 const updateStartup = async (startupId, startupData) => {
   try {
+    // Remove any timestamp or internal fields
+    const { updated_at, created_at, startup_id, ...cleanData } = startupData;
+
     const response = await fetch(
       `${API_BASE_URL}/api/v1/startups/update-startup/${startupId}`,
       {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          // Add authorization if needed
+          // "Authorization": `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(startupData),
+        credentials: "include",
+        body: JSON.stringify(cleanData),
       }
     );
 
     if (!response.ok) {
-      throw new Error("Failed to update startup");
+      const errorText = await response.text();
+      console.error("Update response status:", response.status);
+      console.error("Server error response:", errorText);
+      throw new Error(`Failed to update startup: ${response.status}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+
+    // Return merged data with preserved ID
+    return {
+      ...cleanData,
+      ...result,
+      startup_id: startupId,
+    };
   } catch (error) {
     console.error("Error updating startup:", error);
     throw error;
   }
 };
 
-const deleteStartup = async (startupId) => {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/v1/startups/delete-startup/${startupId}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+// Added StartupViewModal component for viewing details
+const StartupViewModal = ({ isOpen, onClose, startup }) => {
+  if (!isOpen || !startup) return null;
 
-    if (!response.ok) {
-      throw new Error("Failed to delete startup");
-    }
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return "Not specified";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
-    return await response.json();
-  } catch (error) {
-    console.error("Error deleting startup:", error);
-    throw error;
-  }
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg w-full max-w-md p-6 max-h-90vh overflow-y-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gray-900">
+            {startup.name}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {/* Status Badge */}
+          <div className="mb-2">
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium
+              ${
+                startup.status === "Idea"
+                  ? "bg-gray-200 text-gray-700"
+                  : startup.status === "Prototype"
+                  ? "bg-blue-100 text-blue-700"
+                  : startup.status === "MVP"
+                  ? "bg-indigo-100 text-indigo-700"
+                  : startup.status === "Launched"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-purple-100 text-purple-700"
+              }`}
+            >
+              {startup.status || "Unknown"}
+            </span>
+          </div>
+
+          {/* Stage Progression */}
+          <div className="my-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">
+              Stage Progress
+            </h3>
+            <StageProgressionStepper currentStage={startup.status} />
+          </div>
+
+          {/* Details */}
+          <div className="border-t pt-4">
+            <dl className="space-y-4">
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Industry</dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {startup.industry || "Not specified"}
+                </dd>
+              </div>
+
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Founder</dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {startup.founder || "Not specified"}
+                </dd>
+              </div>
+
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  Founded Date
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {formatDate(startup.founded_date)}
+                </dd>
+              </div>
+
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  Description
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {startup.description || "No description provided"}
+                </dd>
+              </div>
+
+              {startup.created_at && (
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">
+                    Record Created
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {formatDate(startup.created_at)}
+                  </dd>
+                </div>
+              )}
+
+              {startup.updated_at && (
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">
+                    Last Updated
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {formatDate(startup.updated_at)}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-// Card for displaying startup information
-const StartupCard = ({ startup, onView, onEdit, onDelete }) => {
+// Card for displaying startup information (updated with view button)
+const StartupCard = ({ startup, onEdit, onView }) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
       <div className="flex justify-between items-start">
@@ -134,24 +260,18 @@ const StartupCard = ({ startup, onView, onEdit, onDelete }) => {
         </div>
         <div className="flex space-x-2">
           <button
+            onClick={() => onView(startup)}
+            className="text-indigo-600 hover:text-indigo-800"
+            title="View Details"
+          >
+            <Eye size={16} />
+          </button>
+          <button
             onClick={() => onEdit(startup)}
             className="text-blue-600 hover:text-blue-800"
             title="Edit"
           >
             <Edit size={16} />
-          </button>
-          <button
-            onClick={() => onDelete(startup.startup_id)}
-            className="text-red-600 hover:text-red-800"
-            title="Delete"
-          >
-            <Trash2 size={16} />
-          </button>
-          <button
-            onClick={() => onView(startup.startup_id)}
-            className="text-indigo-600 hover:text-indigo-800 flex items-center gap-1 text-sm font-medium"
-          >
-            View <ChevronRight size={16} />
           </button>
         </div>
       </div>
@@ -181,7 +301,7 @@ const StageProgressionStepper = ({ currentStage }) => {
     <div className="w-full py-4">
       <div className="flex items-center justify-between w-full">
         {stages.map((stage, index) => (
-          <React.Fragment key={stage}>
+          <React.Fragment key={`stage-${stage}-${index}`}>
             <div className="flex flex-col items-center">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center
@@ -230,13 +350,30 @@ const StartupFormModal = ({ isOpen, onClose, onSubmit, startup = null }) => {
   // Initialize form with startup data if in edit mode
   useEffect(() => {
     if (isEditMode && startup) {
+      // Format the date for the date input (YYYY-MM-DD)
+      let formattedDate = "";
+      if (startup.founded_date) {
+        const date = new Date(startup.founded_date);
+        formattedDate = date.toISOString().split("T")[0];
+      }
+
       setFormData({
         name: startup.name || "",
         description: startup.description || "",
         founder: startup.founder || "",
         industry: startup.industry || "",
-        founded_date: startup.founded_date || "",
+        founded_date: formattedDate,
         status: startup.status || "Idea",
+      });
+    } else {
+      // Reset form when not in edit mode
+      setFormData({
+        name: "",
+        description: "",
+        founder: "",
+        industry: "",
+        founded_date: "",
+        status: "Idea",
       });
     }
   }, [startup, isEditMode]);
@@ -255,21 +392,24 @@ const StartupFormModal = ({ isOpen, onClose, onSubmit, startup = null }) => {
     setError(null);
 
     try {
-      const data = {
-        ...formData,
-        updated_at: new Date().toISOString(),
-      };
+      // Only include the form fields, remove timestamp handling
+      const submissionData = { ...formData };
 
-      // Add created_at only for new startups
-      if (!isEditMode) {
-        data.created_at = new Date().toISOString();
-      }
-
-      await onSubmit(data);
+      console.log(
+        `${isEditMode ? "Updating" : "Adding"} startup with data:`,
+        submissionData
+      );
+      await onSubmit(submissionData);
       onClose();
     } catch (error) {
+      console.error(
+        `Error ${isEditMode ? "updating" : "adding"} startup:`,
+        error
+      );
       setError(
-        `Failed to ${isEditMode ? "update" : "add"} startup. Please try again.`
+        `Failed to ${isEditMode ? "update" : "add"} startup: ${
+          error.message || "Please try again."
+        }`
       );
     } finally {
       setIsSubmitting(false);
@@ -294,7 +434,7 @@ const StartupFormModal = ({ isOpen, onClose, onSubmit, startup = null }) => {
         </div>
 
         {error && (
-          <div className="mb-4 p-2 bg-red-100 text-red-700 rounded-md">
+          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md border border-red-300">
             {error}
           </div>
         )}
@@ -413,45 +553,6 @@ const StartupFormModal = ({ isOpen, onClose, onSubmit, startup = null }) => {
   );
 };
 
-// Confirmation Modal for Delete
-const DeleteConfirmationModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  startupName,
-}) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-md p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Confirm Deletion
-        </h2>
-        <p className="mb-6 text-gray-600">
-          Are you sure you want to delete "{startupName}"? This action cannot be
-          undone.
-        </p>
-
-        <div className="flex justify-end space-x-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 function StartupHub() {
   const navigate = useNavigate();
   const { startupId } = useParams();
@@ -460,19 +561,23 @@ function StartupHub() {
   const [selectedStartup, setSelectedStartup] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [startupToEdit, setStartupToEdit] = useState(null);
-  const [startupToDelete, setStartupToDelete] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [startupToView, setStartupToView] = useState(null); // Added for view feature
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch startups from API
   useEffect(() => {
     const getStartups = async () => {
+      setIsLoading(true);
       try {
         const data = await fetchStartups();
+        console.log("Fetched startups:", data);
         setStartups(data);
         setError(null);
       } catch (err) {
         setError("Failed to load startups. Please try again later.");
-        console.error(err);
+        console.error("Error fetching startups:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -482,7 +587,9 @@ function StartupHub() {
   // Handle adding a new startup
   const handleAddStartup = async (newStartup) => {
     try {
+      console.log("Adding new startup:", newStartup);
       const addedStartup = await addStartup(newStartup);
+      console.log("Successfully added startup:", addedStartup);
       setStartups((prevStartups) => [...prevStartups, addedStartup]);
       return addedStartup;
     } catch (error) {
@@ -494,23 +601,31 @@ function StartupHub() {
   // Handle updating a startup
   const handleUpdateStartup = async (updatedData) => {
     try {
+      if (!startupToEdit?.startup_id) {
+        throw new Error("Invalid startup selected for update");
+      }
+
+      // Create clean update data
+      const updateData = {
+        ...updatedData,
+        startup_id: startupToEdit.startup_id,
+      };
+
       const updatedStartup = await updateStartup(
         startupToEdit.startup_id,
-        updatedData
+        updateData
       );
+
+      // Update local state
       setStartups((prevStartups) =>
         prevStartups.map((s) =>
           s.startup_id === startupToEdit.startup_id ? updatedStartup : s
         )
       );
 
-      // Update selected startup if it's the one being edited
-      if (
-        selectedStartup &&
-        selectedStartup.startup_id === startupToEdit.startup_id
-      ) {
-        setSelectedStartup(updatedStartup);
-      }
+      // Clear edit mode
+      setStartupToEdit(null);
+      setShowAddModal(false);
 
       return updatedStartup;
     } catch (error) {
@@ -519,67 +634,16 @@ function StartupHub() {
     }
   };
 
-  // Handle deleting a startup
-  const handleDeleteStartup = async () => {
-    try {
-      await deleteStartup(startupToDelete);
-      setStartups((prevStartups) =>
-        prevStartups.filter((s) => s.startup_id !== startupToDelete)
-      );
-
-      // If the deleted startup was selected, clear the selection
-      if (selectedStartup && selectedStartup.startup_id === startupToDelete) {
-        closeDetails();
-      }
-
-      setShowDeleteModal(false);
-    } catch (error) {
-      console.error("Error in handleDeleteStartup:", error);
-      setError("Failed to delete startup. Please try again.");
-    }
-  };
-
-  // Load selected startup from URL param
-  useEffect(() => {
-    if (startupId && startups.length > 0) {
-      const startup = startups.find(
-        (s) => s.startup_id === parseInt(startupId)
-      );
-      if (startup) {
-        setSelectedStartup(startup);
-      }
-    }
-  }, [startupId, startups]);
-
-  // View startup details
-  const viewStartup = (id) => {
-    const startup = startups.find((s) => s.startup_id === id);
-    setSelectedStartup(startup);
-    navigate(`/startup-hub/${id}`);
-  };
-
   // Edit startup
   const editStartup = (startup) => {
+    console.log("Editing startup:", startup);
     setStartupToEdit(startup);
   };
 
-  // Confirm delete startup
-  const confirmDeleteStartup = (id) => {
-    const startup = startups.find((s) => s.startup_id === id);
-    setStartupToDelete(id);
-    setShowDeleteModal(true);
-  };
-
-  // Close startup details view
-  const closeDetails = () => {
-    setSelectedStartup(null);
-    navigate("/startup-hub");
-  };
-
-  // Get the name of the startup to delete
-  const getStartupNameToDelete = () => {
-    const startup = startups.find((s) => s.startup_id === startupToDelete);
-    return startup ? startup.name : "";
+  // View startup details
+  const viewStartup = (startup) => {
+    console.log("Viewing startup details:", startup);
+    setStartupToView(startup);
   };
 
   return (
@@ -589,124 +653,16 @@ function StartupHub() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {selectedStartup ? (
-          <div className="bg-white shadow rounded-lg">
-            {/* Startup Detail View */}
-            <div className="border-b border-gray-200 px-8 py-6 flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-gray-800">
-                {selectedStartup.name}
-              </h2>
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => editStartup(selectedStartup)}
-                  className="flex items-center space-x-1 px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                >
-                  <Edit size={16} />
-                  <span>Edit</span>
-                </button>
-                <button
-                  onClick={() =>
-                    confirmDeleteStartup(selectedStartup.startup_id)
-                  }
-                  className="flex items-center space-x-1 px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
-                >
-                  <Trash2 size={16} />
-                  <span>Delete</span>
-                </button>
-                <button
-                  onClick={closeDetails}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-            </div>
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+            {error}
+          </div>
+        )}
 
-            <div className="p-8">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2">
-                  <div className="mb-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      About
-                    </h3>
-                    <p className="text-gray-600">
-                      {selectedStartup.description ||
-                        "No description available."}
-                    </p>
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      Progress
-                    </h3>
-                    <StageProgressionStepper
-                      currentStage={selectedStartup.status}
-                    />
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      Industry
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-800">
-                        {selectedStartup.industry || "Not specified"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="mb-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      Founder
-                    </h3>
-                    <p className="text-gray-600">
-                      {selectedStartup.founder || "Not specified"}
-                    </p>
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      Founded Date
-                    </h3>
-                    <p className="text-gray-600">
-                      {selectedStartup.founded_date
-                        ? new Date(
-                            selectedStartup.founded_date
-                          ).toLocaleDateString()
-                        : "Not specified"}
-                    </p>
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      Created
-                    </h3>
-                    <p className="text-gray-600">
-                      {selectedStartup.created_at
-                        ? new Date(
-                            selectedStartup.created_at
-                          ).toLocaleDateString()
-                        : "Not specified"}
-                    </p>
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      Last Updated
-                    </h3>
-                    <p className="text-gray-600">
-                      {selectedStartup.updated_at
-                        ? new Date(
-                            selectedStartup.updated_at
-                          ).toLocaleDateString()
-                        : "Not specified"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <p className="text-gray-600">Loading startups...</p>
           </div>
         ) : (
           <>
@@ -771,11 +727,10 @@ function StartupHub() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {startups.map((startup) => (
                     <StartupCard
-                      key={startup.startup_id}
+                      key={`startup-${startup.startup_id}`}
                       startup={startup}
-                      onView={viewStartup}
                       onEdit={editStartup}
-                      onDelete={confirmDeleteStartup}
+                      onView={viewStartup}
                     />
                   ))}
                 </div>
@@ -800,12 +755,11 @@ function StartupHub() {
         startup={startupToEdit}
       />
 
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={handleDeleteStartup}
-        startupName={getStartupNameToDelete()}
+      {/* View Startup Modal */}
+      <StartupViewModal
+        isOpen={!!startupToView}
+        onClose={() => setStartupToView(null)}
+        startup={startupToView}
       />
     </div>
   );
