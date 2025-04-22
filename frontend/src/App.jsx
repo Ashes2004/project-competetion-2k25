@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-
-import StartupHub from "./components/StartupHub";
+import StartupHub from "./pages/StartupHub";
 import AuthToggler from "./pages/Auth";
 import Research from "./pages/Research";
 
@@ -20,12 +19,11 @@ function App() {
         
         <Route path="/innovations" element={< Innovation/>} />
         
-        <Route path="/startup-hub" element={<StartupHub />} />
-        <Route path="/startup-hub/:startupId" element={<StartupHub />} />
+        <Route path="/startups" element={<StartupHub />} />
+        <Route path="/startups/:startupId" element={<StartupHub />} />
 
         <Route path="/research" element = {<Research/>}/>
         <Route path="/research/form" element={<ResearchForm/>} />
-        <Route path="/ipr" element = {<IPRDashboard/>}/>
 
       </Routes>
     </Router>
