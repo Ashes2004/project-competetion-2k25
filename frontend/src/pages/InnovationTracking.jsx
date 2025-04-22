@@ -1,211 +1,298 @@
-import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-
-export default function InnovationDashboard() {
+// src/pages/Innovation.jsx
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { fetchInnovations, fetchDashboardSummary, deleteInnovation } from '../api/innovationService';
+import DashboardSummary from '../components/DashboardSummary';
+import InnovationForm from '../components/InnovationForm'; 
+import '../styles/Innovation.css'; // Assuming you have a CSS file for styling 
+const Innovation = () => {
   const [innovations, setInnovations] = useState([]);
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    domain: "",
-    level: "",
-    status: "draft",
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('summary');
+  const [showForm, setShowForm] = useState(false);
+  const [selectedInnovation, setSelectedInnovation] = useState(null);
+  const [filters, setFilters] = useState({
+    domain: '',
+    level: '',
+    status: ''
   });
-  const [editingId, setEditingId] = useState(null);
 
-  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
-  const fetchInnovations = async () => {
+  useEffect(() => {
+    loadData();
+  }, [filters]);
+
+  const loadData = async () => {
     try {
-      const res = await fetch("https://riise.koyeb.app/api/v1/innovations/", {
-        // headers: {
-        //   Authorization: `Bearer ${token}`,
-        // },
-        credentials: "include",
-      });
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await res.json();
-      console.log("data: " , data);
+      setLoading(true);
       
-      setInnovations(data);
+      // Fetch innovations with applied filters
+      const innovationsData = await fetchInnovations(filters);
+      setInnovations(innovationsData);
+      
+      // Fetch dashboard summary statistics
+      const summaryData = await fetchDashboardSummary();
+      setSummary(summaryData);
+      
+      setError(null);
     } catch (err) {
-      console.error("Error fetching innovations:", err);
+      console.error("Error loading data:", err);
+      setError("Failed to load innovations data. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
-    const method = editingId ? "PUT" : "POST";
-    const url = editingId
-      ? `https://riise.koyeb.app/api/v1/innovations/update-innovation/${editingId}`
-      : "https://riise.koyeb.app/api/v1/innovations/add-innovation";
-
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          // Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-        body: JSON.stringify(form),
-      });
-
-      const result = await res.json();
-
-      if (res.ok) {
-        alert(editingId ? "Innovation updated!" : "Innovation added!");
-        setForm({
-          title: "",
-          description: "",
-          domain: "",
-          level: "",
-          status: "draft",
-        });
-        setEditingId(null);
-        fetchInnovations();
-      } else {
-        alert(result.error || "Something went wrong.");
-      }
-    } catch (err) {
-      console.error(err);
-    }
+  const handleAddNew = () => {
+    setSelectedInnovation(null);
+    setShowForm(true);
   };
 
   const handleEdit = (innovation) => {
-    setForm({
-      title: innovation.title,
-      description: innovation.description,
-      domain: innovation.domain,
-      level: innovation.level,
-      status: innovation.status,
-    });
-    setEditingId(innovation.innovation_id);
+    setSelectedInnovation(innovation);
+    setShowForm(true);
+  };
+
+  const handleView = (id) => {
+    navigate(`/innovations/${id}`);
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure to delete?")) return;
-
-    try {
-      const res = await fetch(`https://riise.koyeb.app/api/v1/innovations/delete-innovation/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const result = await res.json();
-
-      if (res.ok) {
-        alert("Innovation deleted!");
-        fetchInnovations();
-      } else {
-        alert(result.error || "Deletion failed.");
+    if (window.confirm("Are you sure you want to delete this innovation?")) {
+      try {
+        await deleteInnovation(id);
+        loadData(); // Reload data after deletion
+      } catch (err) {
+        console.error("Error deleting innovation:", err);
+        setError("Failed to delete innovation.");
       }
-    } catch (err) {
-      console.error("Delete error:", err);
     }
   };
 
-  useEffect(() => {
-    fetchInnovations();
-  }, []);
+  const handleFormSubmit = () => {
+    setShowForm(false);
+    loadData(); // Reload data after form submission
+  };
+
+  const handleFormCancel = () => {
+    setShowForm(false);
+  };
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'draft': return 'status-badge draft';
+      case 'submitted': return 'status-badge submitted';
+      case 'approved': return 'status-badge approved';
+      default: return 'status-badge';
+    }
+  };
+
+  if (loading && !innovations.length) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner">Loading...</div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <Navbar/>
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-6">Innovation Dashboard</h1>
-
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-2xl shadow"
-      >
-        <input
-          name="title"
-          placeholder="Title"
-          value={form.title}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded"
-        />
-        <input
-          name="domain"
-          placeholder="Domain"
-          value={form.domain}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded"
-        />
-        <input
-          name="level"
-          placeholder="Level"
-          value={form.level}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded"
-        />
-        <input
-          name="status"
-          placeholder="Status"
-          value={form.status}
-          onChange={handleChange}
-          className="border p-2 rounded"
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          required
-          className="col-span-2 border p-2 rounded resize-none"
-        ></textarea>
-        <button
-          type="submit"
-          className="col-span-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          {editingId ? "Update" : "Add"} Innovation
-        </button>
-      </form>
-
-      <div className="grid gap-4 mt-8">
-        {innovations.map((i) => (
-          <div
-            key={i.innovation_id}
-            className="bg-white shadow p-4 rounded-2xl border"
+    <div className="innovation-page">
+      <div className="page-header">
+        <div className="header-content">
+          <h1>Innovation Management</h1>
+          <p>Track, manage, and analyze innovation projects</p>
+        </div>
+        <div className="header-actions">
+          <button 
+            className="btn-primary" 
+            onClick={handleAddNew}
           >
-            <h2 className="text-xl font-bold">{i.title}</h2>
-            <p className="text-sm text-gray-600">
-              {i.domain} | Level: {i.level} | Status: {i.status}
-            </p>
-            <p className="mt-2">{i.description}</p>
-            <p className="text-xs text-gray-400 mt-1">
-              Submitted on: {new Date(i.submitted_on).toLocaleDateString()}
-            </p>
-            <div className="flex gap-2 mt-4">
-              <button
-                onClick={() => handleEdit(i)}
-                className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(i.innovation_id)}
-                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-              >
-                Delete
-              </button>
+            Add New Innovation
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="error-alert">
+          <p>{error}</p>
+          <button onClick={() => setError(null)}>Dismiss</button>
+        </div>
+      )}
+
+      <div className="tabs-container">
+        <div className="tabs">
+          <button 
+            className={`tab ${activeTab === 'summary' ? 'active' : ''}`}
+            onClick={() => handleTabChange('summary')}
+          >
+            Dashboard
+          </button>
+          <button 
+            className={`tab ${activeTab === 'list' ? 'active' : ''}`}
+            onClick={() => handleTabChange('list')}
+          >
+            All Innovations
+          </button>
+        </div>
+      </div>
+
+      <div className="tab-content">
+        {activeTab === 'summary' && summary && (
+          <DashboardSummary summary={summary} />
+        )}
+
+        {activeTab === 'list' && (
+          <div className="innovations-list-container">
+            <div className="filters-section">
+              <div className="filters-grid">
+                <div className="filter-item">
+                  <label htmlFor="domain-filter">Domain</label>
+                  <select 
+                    id="domain-filter"
+                    name="domain"
+                    value={filters.domain}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="">All Domains</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Education">Education</option>
+                    <option value="Agriculture">Agriculture</option>
+                    <option value="Environment">Environment</option>
+                  </select>
+                </div>
+
+                <div className="filter-item">
+                  <label htmlFor="level-filter">Level</label>
+                  <select 
+                    id="level-filter"
+                    name="level"
+                    value={filters.level}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="">All Levels</option>
+                    <option value="institute">Institute</option>
+                    <option value="state">State</option>
+                    <option value="national">National</option>
+                  </select>
+                </div>
+
+                <div className="filter-item">
+                  <label htmlFor="status-filter">Status</label>
+                  <select 
+                    id="status-filter"
+                    name="status"
+                    value={filters.status}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="">All Status</option>
+                    <option value="draft">Draft</option>
+                    <option value="submitted">Submitted</option>
+                    <option value="approved">Approved</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="table-container">
+              <table className="innovations-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Domain</th>
+                    <th>Level</th>
+                    <th>Status</th>
+                    <th>Submitted On</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {innovations.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="empty-state">
+                        <p>No innovations found matching your criteria</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    innovations.map((innovation) => (
+                      <tr key={innovation.innovation_id}>
+                        <td className="title-cell">{innovation.title}</td>
+                        <td>{innovation.domain || 'N/A'}</td>
+                        <td>{innovation.level || 'N/A'}</td>
+                        <td>
+                          <span className={getStatusClass(innovation.status)}>
+                            {innovation.status ? innovation.status.charAt(0).toUpperCase() + innovation.status.slice(1) : 'N/A'}
+                          </span>
+                        </td>
+                        <td>{innovation.submitted_on || 'Not submitted'}</td>
+                        <td className="actions-cell">
+                          <button 
+                            className="btn-icon view" 
+                            onClick={() => handleView(innovation.innovation_id)}
+                            title="View Details"
+                          >
+                            View
+                          </button>
+                          <button 
+                            className="btn-icon edit" 
+                            onClick={() => handleEdit(innovation)}
+                            title="Edit"
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            className="btn-icon delete" 
+                            onClick={() => handleDelete(innovation.innovation_id)}
+                            title="Delete"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
-        ))}
+        )}
       </div>
-    </div>
+
+      {showForm && (
+        <div className="modal">
+          <div className="modal-backdrop" onClick={handleFormCancel}></div>
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>{selectedInnovation ? 'Edit Innovation' : 'Add New Innovation'}</h2>
+              <button className="close-btn" onClick={handleFormCancel}>×</button>
+            </div>
+            <div className="modal-body">
+              <InnovationForm 
+                innovation={selectedInnovation} 
+                onSubmit={handleFormSubmit}
+                onCancel={handleFormCancel}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default Innovation;
