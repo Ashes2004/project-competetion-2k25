@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, User } from "lucide-react";
 import axios from "axios";
 
-const Navbar = () => {
+const Homenav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,15 +14,70 @@ const Navbar = () => {
     setIsLoggedIn(!!userEmail);
   }, []);
 
+  const clearAllCookies = () => {
+    // Get all cookies
+    const cookies = document.cookie.split(';');
+    
+    // Get the current domain
+    const domain = window.location.hostname;
+    
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i];
+      const eqPos = cookie.indexOf('=');
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      
+      if (name) {
+        // Clear with multiple combinations of path and domain to ensure complete removal
+        // Root path
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+        
+        // With domain
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${domain};`;
+        
+        // For subdomains
+        if (domain.indexOf('.') !== -1) {
+          const rootDomain = domain.substring(domain.indexOf('.'));
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${rootDomain};`;
+        }
+        
+        // Various paths that might be used
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/api/;`;
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/auth/;`;
+      }
+    }
+  };
+
   const handleLogout = async () => {
     try {
-      await axios.post("https://riise.koyeb.app/api/v1/users/logout");
+      // Configure axios to include credentials (cookies)
+      const response = await axios.post("https://riise.koyeb.app/api/v1/users/logout", {}, {
+        withCredentials: true // This ensures cookies are sent with the request
+      });
+      
+      // Clear client-side storage
       sessionStorage.removeItem("userEmail");
+      sessionStorage.clear();
+      localStorage.clear(); // Also clear localStorage in case anything is stored there
+      
+      // Clear cookies that are accessible via JavaScript
+      clearAllCookies();
+      
       setIsLoggedIn(false);
       setShowPopup(false);
       navigate("/");
+      
+      console.log("Logout successful:", response.data);
     } catch (error) {
       console.error("Logout failed:", error);
+      
+      // Even if the API call fails, still clear client-side data
+      sessionStorage.clear();
+      localStorage.clear();
+      clearAllCookies();
+      
+      setIsLoggedIn(false);
+      setShowPopup(false);
+      navigate("/");
     }
   };
 
@@ -34,7 +89,7 @@ const Navbar = () => {
           <img
             src="/RIISE Logo White.png"
             alt="Riise Logo"
-            className="h-16 w-16 object-contain"
+            className="h-20 w-20 object-contain"
           />
          
         </Link>
@@ -43,7 +98,7 @@ const Navbar = () => {
         <div className="md:hidden">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="text-blue-500 focus:outligrayone"
+            className="text-gray-300 focus:outline-none"
           >
             {isOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -51,19 +106,19 @@ const Navbar = () => {
 
         {/* Desktop menu */}
         <div className="hidden md:flex space-x-6 items-center">
-          <Link to="/research" className="text-blue-500 hover:text-gray-500">
+          <Link to="/research" className="text-gray-300 hover:text-blue-500">
             Research
           </Link>
-          <Link to="/ipr" className="text-blue-500 hover:text-gray-500">
+          <Link to="/ipr" className="text-gray-300 hover:text-blue-500">
             IPR
           </Link>
-          <Link to="/innovation" className="text-blue-500 hover:text-gray-500">
+          <Link to="/innovation" className="text-gray-300 hover:text-blue-500">
             Innovation
           </Link>
-          <Link to="/startup" className="text-blue-500 hover:text-gray-500">
+          <Link to="/startup" className="text-gray-300 hover:text-blue-500">
             Start-up
           </Link>
-          <Link to="/about" className="text-blue-500 hover:text-gray-500">
+          <Link to="/about" className="text-gray-300 hover:text-blue-500">
             About Us
           </Link>
 
@@ -71,8 +126,8 @@ const Navbar = () => {
             <div className="relative">
               <button
                 onClick={() => setShowPopup(!showPopup)}
-                className="text-blue-500"
-                >
+                className="text-gray-300"
+              >
                 <User size={24} />
               </button>
               {showPopup && (
@@ -100,19 +155,19 @@ const Navbar = () => {
       {/* Mobile menu */}
       {isOpen && (
         <div className="md:hidden mt-4 px-4 space-y-3">
-          <Link to="/#research" className="block text-blue-500 hover:text-gray-500">
+          <Link to="/#research" className="block text-gray-300 hover:text-blue-500">
             Research
           </Link>
-          <Link to="/#ipr" className="block text-blue-500 hover:text-gray-500">
+          <Link to="/#ipr" className="block text-gray-300 hover:text-blue-500">
             IPR
           </Link>
-          <Link to="/#innovation" className="block text-blue-500 hover:text-gray-500">
+          <Link to="/#innovation" className="block text-gray-300 hover:text-blue-500">
             Innovation
           </Link>
-          <Link to="/#startup" className="block text-blue-500 hover:text-gray-500">
+          <Link to="/#startup" className="block text-gray-300 hover:text-blue-500">
             Start-up
           </Link>
-          <Link to="/#about" className="block text-blue-500 hover:text-gray-500">
+          <Link to="/#about" className="block text-gray-300 hover:text-blue-500">
             About Us
           </Link>
 
@@ -137,4 +192,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default Homenav;

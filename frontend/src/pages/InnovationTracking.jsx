@@ -5,6 +5,7 @@ import { fetchInnovations, fetchDashboardSummary, deleteInnovation } from '../ap
 import DashboardSummary from '../components/DashboardSummary';
 import InnovationForm from '../components/InnovationForm'; 
 import '../styles/Innovation.css'; // Assuming you have a CSS file for styling 
+import Navbar from '../components/Navbar';
 const Innovation = () => {
   const [innovations, setInnovations] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -111,7 +112,9 @@ const Innovation = () => {
   }
 
   return (
+    <div><Navbar/>
     <div className="innovation-page">
+      
       <div className="page-header">
         <div className="header-content">
           <h1>Innovation Management</h1>
@@ -291,6 +294,7 @@ const Innovation = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

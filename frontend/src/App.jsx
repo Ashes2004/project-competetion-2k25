@@ -5,6 +5,10 @@ import StartupHub from "./components/StartupHub";
 import AuthToggler from "./pages/Auth";
 import Research from "./pages/Research";
 
+import Innovation from "./pages/InnovationTracking";
+import IPR from "./pages/IPR";
+
+import InnovationTracking from "./pages/InnovationTracking";
 import ResearchForm from "./pages/ResearchForm";
 import IPRDashboard from "./pages/IPR"
 
