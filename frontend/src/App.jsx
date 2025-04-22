@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import StartupHub from "./components/StartupHub";
 import AuthToggler from "./pages/Auth";
 import Research from "./pages/Research";
-import InnovationTracking from "./pages/InnovationTracking";
+
 import ResearchForm from "./pages/ResearchForm";
 import IPRDashboard from "./pages/IPR"
 
@@ -18,7 +18,7 @@ function App() {
         
         <Route path="/auth" element={<AuthToggler />} />
         
-        <Route path="/innovation-tracking" element={< InnovationTracking/>} />
+        <Route path="/innovations" element={< Innovation/>} />
         
         <Route path="/startup-hub" element={<StartupHub />} />
         <Route path="/startup-hub/:startupId" element={<StartupHub />} />
