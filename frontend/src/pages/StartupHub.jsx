@@ -11,10 +11,9 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 
-// API service for startup data
+
 const API_BASE_URL = "https://riise.koyeb.app";
 
-// Enhanced API functions with better error handling
 const fetchStartups = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/v1/startups/`, {
@@ -555,6 +554,7 @@ const StartupFormModal = ({ isOpen, onClose, onSubmit, startup = null }) => {
 
 function StartupHub() {
   const navigate = useNavigate();
+ 
   const { startupId } = useParams();
   const [startups, setStartups] = useState([]);
   const [error, setError] = useState(null);
@@ -563,9 +563,14 @@ function StartupHub() {
   const [startupToEdit, setStartupToEdit] = useState(null);
   const [startupToView, setStartupToView] = useState(null); // Added for view feature
   const [isLoading, setIsLoading] = useState(true);
+ 
 
   // Fetch startups from API
   useEffect(() => {
+    const userEmail =  sessionStorage.getItem('userEmail');  
+    if (!userEmail || userEmail == 'undefined') {
+     navigate('/auth')
+    }
     const getStartups = async () => {
       setIsLoading(true);
       try {

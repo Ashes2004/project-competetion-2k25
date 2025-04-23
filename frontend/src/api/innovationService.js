@@ -17,8 +17,10 @@ export const fetchInnovations = async (filters = {}) => {
   if (!response.ok) {
     throw new Error('Failed to fetch innovations');
   }
+  const data = await response.json();
+  console.log(data);
   
-  return await response.json();
+  return data;
 };
 
 export const fetchInnovation = async (id) => {

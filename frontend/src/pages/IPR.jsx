@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Calendar, FileText, Plus, Search, TrendingUp, Users, Award, Filter } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // Mock data for demonstration
 const mockIprData = [
@@ -32,10 +33,16 @@ export default function IPRDashboard() {
   const [iprData, setIprData] = useState(mockIprData);
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
-  
+  const navigate = useNavigate();
+  useEffect(()=>{
+         const userEmail =  sessionStorage.getItem('userEmail');  
+         if (!userEmail || userEmail == 'undefined') {
+          navigate('/auth')
+         }
+    },[])
   // Toggle between dashboard and filing page
   const toggleFilingPage = () => {
-    setShowFilingPage(!showFilingPage);
+    setShowFilingPage(!showFilingPage);s
   };
 
   // Handle form submission
@@ -106,6 +113,13 @@ function Dashboard({
         >
           <Plus size={20} className="mr-2" />
           File New IPR
+        </button>
+        <button 
+          onClick={onNewIpr}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center"
+        >
+          <Plus size={20} className="mr-2" />
+          IPR Guide
         </button>
       </div>
 

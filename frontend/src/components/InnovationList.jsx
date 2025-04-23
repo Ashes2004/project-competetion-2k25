@@ -32,6 +32,7 @@ const InnovationList = ({ innovations, onSelect, onRefresh }) => {
         <thead>
           <tr>
             <th>Title</th>
+            <th>Author</th>
             <th>Domain</th>
             <th>Level</th>
             <th>Status</th>
@@ -48,6 +49,7 @@ const InnovationList = ({ innovations, onSelect, onRefresh }) => {
             innovations.map(innovation => (
               <tr key={innovation.innovation_id}>
                 <td>{innovation.title}</td>
+                <td>{innovation.user_id || 'N/A'}</td>
                 <td>{innovation.domain || 'N/A'}</td>
                 <td>{innovation.level || 'N/A'}</td>
                 <td>

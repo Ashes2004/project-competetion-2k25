@@ -5,6 +5,7 @@ import { fetchInnovations, fetchDashboardSummary, deleteInnovation } from '../ap
 import DashboardSummary from '../components/DashboardSummary';
 import InnovationForm from '../components/InnovationForm'; 
 import '../styles/Innovation.css'; // Assuming you have a CSS file for styling 
+import Navbar from '../components/Navbar';
 const Innovation = () => {
   const [innovations, setInnovations] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -25,6 +26,14 @@ const Innovation = () => {
     loadData();
   }, [filters]);
 
+
+
+  useEffect(()=>{
+       const userEmail =  sessionStorage.getItem('userEmail');  
+       if (!userEmail || userEmail == 'undefined') {
+        navigate('/auth')
+       }
+  },[])
   const loadData = async () => {
     try {
       setLoading(true);
@@ -111,6 +120,8 @@ const Innovation = () => {
   }
 
   return (
+    <div>
+      <Navbar/>
     <div className="innovation-page">
       <div className="page-header">
         <div className="header-content">
@@ -214,6 +225,7 @@ const Innovation = () => {
                 <thead>
                   <tr>
                     <th>Title</th>
+                    <th>Author</th>
                     <th>Domain</th>
                     <th>Level</th>
                     <th>Status</th>
@@ -232,6 +244,7 @@ const Innovation = () => {
                     innovations.map((innovation) => (
                       <tr key={innovation.innovation_id}>
                         <td className="title-cell">{innovation.title}</td>
+                        <td >{innovation.user_id || 'N/A'}</td>
                         <td>{innovation.domain || 'N/A'}</td>
                         <td>{innovation.level || 'N/A'}</td>
                         <td>
@@ -257,7 +270,7 @@ const Innovation = () => {
                           </button>
                           <button 
                             className="btn-icon delete" 
-                            onClick={() => handleDelete(innovation.innovation_id)}
+                            // onClick={() => handleDelete(innovation.innovation_id)}
                             title="Delete"
                           >
                             Delete
@@ -291,6 +304,7 @@ const Innovation = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };
