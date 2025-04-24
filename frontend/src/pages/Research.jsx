@@ -184,16 +184,21 @@ export default function ResearchDashboard() {
   const handleUpdateResearch = async (e) => {
     e.preventDefault();
     try {
-      
-      const response = await axios.put(`${API_BASE_URL}/update-paper/${currentResearch.paper_id}`, currentResearch, {
+      const response = await fetch(`${API_BASE_URL}/update-paper/${currentResearch.paper_id}`, {
+        method: 'PUT',
         headers: {
-          
           'Content-Type': 'application/json'
         },
-        "withCredentials": true
+        body: JSON.stringify(currentResearch),
+        credentials: 'include'
       });
+      const data = await response.json();
+      console.log(currentResearch.paper_id , currentResearch);
       
-      if (response.data && response.data.success) {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+        else  {
         // Refresh the research papers list
         fetchResearchPapers();
         setShowEditModal(false);
