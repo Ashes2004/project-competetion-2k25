@@ -1,10 +1,10 @@
-// src/pages/Innovation.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchInnovations, fetchDashboardSummary, deleteInnovation } from '../api/innovationService';
 import DashboardSummary from '../components/DashboardSummary';
 import InnovationForm from '../components/InnovationForm'; 
-
+import '../styles/Innovation.css'; 
 import Navbar from '../components/Navbar';
 const Innovation = () => {
   const [innovations, setInnovations] = useState([]);
@@ -113,9 +113,9 @@ const Innovation = () => {
 
   if (loading && !innovations.length) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner">Loading...</div>
-      </div>
+      <div className="flex justify-center items-center p-8">
+      <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
     );
   }
 

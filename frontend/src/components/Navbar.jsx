@@ -109,7 +109,7 @@ const Navbar = () => {
           <NavLink to="/research">Research</NavLink>
           <NavLink to="/ipr">IPR</NavLink>
           <NavLink to="/innovations">Innovation</NavLink>
-          <NavLink to="/startup">Start-up</NavLink>
+          <NavLink to="/startups">Start-up</NavLink>
           <NavLink to="/about">About Us</NavLink>
 
           {isLoggedIn ? (
