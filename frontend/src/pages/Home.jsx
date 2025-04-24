@@ -64,6 +64,7 @@ const Home = () => {
     }
   ];
 
+
   return (
     <div className="min-w-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
@@ -95,6 +96,7 @@ const Home = () => {
             </div>
           </div>
         </section>
+
         
         {/* Stats Section */}
         <div className="container mx-auto px-4 pb-12 z-10">
@@ -110,6 +112,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+
 
       {/* Services Section */}
       <section id="services" className="container mx-auto px-6 py-32 mt-12">
@@ -131,13 +134,14 @@ const Home = () => {
                   {card.description}
                 </p>
               </div>
-              <button className={`${card.buttonColor} text-white font-semibold py-2 px-5 rounded-lg w-full transition-all`}>
+              <button  className={`${card.buttonColor} text-white font-semibold py-2 px-5 rounded-lg w-full transition-all`}>
                 {card.buttonText}
               </button>
             </div>
           ))}
         </div>
       </section>
+         
 
       {/* Features Section */}
       <section className="bg-gray-50 py-24">
@@ -244,6 +248,7 @@ const Home = () => {
         </div>
       </section>
 
+
       {/* CTA Section */}
       <section className="container mx-auto px-6 py-24">
         <div className="bg-blue-800 rounded-3xl overflow-hidden shadow-2xl">
@@ -265,3 +270,4 @@ const Home = () => {
 };
 
 export default Home;
+
