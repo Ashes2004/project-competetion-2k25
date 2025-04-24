@@ -122,6 +122,7 @@ const Innovation = () => {
   return (
     <div>
       <Navbar/>
+      <div className='h-24'></div>
     <div className="innovation-page">
       <div className="page-header">
         <div className="header-content">

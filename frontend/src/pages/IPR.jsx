@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { Calendar, FileText, Plus, Search, TrendingUp, Users, Award, Filter } from 'lucide-react';
+import { Calendar, FileText, Plus, Search, TrendingUp, Users, Award, Filter, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 // Mock data for demonstration
 const mockIprData = [
@@ -65,6 +66,8 @@ export default function IPRDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar/>
+      <div className='h-20'></div>
       {showFilingPage ? (
         <IprFilingPage onSubmit={handleSubmitIpr} onCancel={toggleFilingPage} />
       ) : (
@@ -102,7 +105,7 @@ function Dashboard({
   // Get unique IPR types and statuses for filters
   const iprTypes = ['all', ...new Set(iprData.map(ipr => ipr.ipr_type))];
   const iprStatuses = ['all', ...new Set(iprData.map(ipr => ipr.status))];
-
+  const navigate = useNavigate();
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
@@ -115,10 +118,10 @@ function Dashboard({
           File New IPR
         </button>
         <button 
-          onClick={onNewIpr}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center"
+          onClick={()=> navigate('/ipr/guide')}
+          className="bg-purple-700 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center"
         >
-          <Plus size={20} className="mr-2" />
+          <Star size={20} className="mr-2" />
           IPR Guide
         </button>
       </div>

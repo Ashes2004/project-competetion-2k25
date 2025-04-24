@@ -44,7 +44,7 @@ export default function Aboutus() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+      <div className="bg-gradient-to-r mt-20 from-blue-600 to-indigo-700 text-white">
         <div className="container mx-auto px-6 py-16 text-center">
           <h1 className="text-4xl font-bold mb-4">About Us</h1>
           <p className="text-xl max-w-2xl mx-auto">

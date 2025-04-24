@@ -1,65 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, FileText, BarChart2, PieChart, ListFilter, Trash2, Edit, Eye, Download, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Make sure to install axios: npm install axios
+import Navbar from '../components/Navbar';
 
 export default function ResearchDashboard() {
   const navigate = useNavigate();
-  useEffect(()=>{
-         const userEmail =  sessionStorage.getItem('userEmail');  
-         if (!userEmail || userEmail == 'undefined') {
-          navigate('/auth')
-         }
-    },[])
-  const initialResearch = [
-    {
-      paper_id: 1,
-      title: "Edge Computing for Real-Time IoT Analytics",
-      authors: "Nikita Sharma, Kunal kr Roy",
-      abstract: "This paper explores edge computing solutions for IoT systems that require real-time analytics.",
-      doi: "10.1016/j.future.2023.102354",
-      created_at: "2023-08-22 14:30:00",
-      updated_at: "2023-08-23 11:45:00",
-      user_id: 12,
-      status: "published"
-    },
-    {
-      paper_id: 2,
-      title: "Machine Learning in Healthcare: A Systematic Review",
-      authors: "John Smith, Sarah Johnson",
-      abstract: "A comprehensive review of machine learning applications in modern healthcare.",
-      doi: "10.1007/s10916-022-1834-0",
-      created_at: "2023-07-15 09:20:00",
-      updated_at: "2023-07-16 14:10:00",
-      user_id: 12,
-      status: "published"
-    },
-    {
-      paper_id: 3,
-      title: "Quantum Computing Applications in Cryptography",
-      authors: "David Chen, Maria Rodriguez",
-      abstract: "Exploring how quantum computing will impact modern cryptographic systems.",
-      doi: "10.1109/TC.2023.3301254",
-      created_at: "2023-09-03 16:45:00",
-      updated_at: "2023-09-05 10:30:00",
-      user_id: 12,
-      status: "submitted"
-    },
-    {
-      paper_id: 4,
-      title: "Deep Learning for Natural Language Processing",
-      authors: "Alex Kim, Priya Patel",
-      abstract: "Advances in deep learning techniques for NLP applications.",
-      doi: "10.1162/tacl_a_00452",
-      created_at: "2024-01-10 11:25:00",
-      updated_at: "2024-01-12 09:15:00",
-      user_id: 12,
-      status: "draft"
+  const API_BASE_URL = 'https://riise.koyeb.app/api/v1/research';
+
+  useEffect(() => {
+    const userEmail = sessionStorage.getItem('userEmail');  
+    if (!userEmail || userEmail === 'undefined') {
+      navigate('/auth');
+    } else {
+      fetchResearchPapers();
     }
-  ];
+  }, []);
 
   // State variables
-  const [research, setResearch] = useState(initialResearch);
-  const [filteredResearch, setFilteredResearch] = useState(initialResearch);
+  const [research, setResearch] = useState([]);
+  const [filteredResearch, setFilteredResearch] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -79,6 +39,36 @@ export default function ResearchDashboard() {
     doi: '',
     status: 'draft'
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch all research papers from the API
+  const fetchResearchPapers = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${API_BASE_URL}/`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      else if(response.ok && data){
+        setResearch(data);
+        setFilteredResearch(data);
+      } else {
+        setResearch([]);
+        setFilteredResearch([]);
+      }
+    } catch (err) {
+      console.error("Error fetching research papers:", err);
+      setError("Failed to load research papers. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Statistics for visualization
   const statusCounts = {
@@ -149,47 +139,89 @@ export default function ResearchDashboard() {
     setCurrentResearch(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submission
-  const handleAddResearch = (e) => {
+  // Handle form submission to add a new research paper
+  const handleAddResearch = async (e) => {
     e.preventDefault();
-    const date = new Date().toISOString().replace('T', ' ').substring(0, 19);
-    const newPaper = {
-      ...newResearch,
-      paper_id: Math.max(...research.map(r => r.paper_id)) + 1,
-      user_id: 12,
-      created_at: date,
-      updated_at: date
-    };
-    
-    setResearch([...research, newPaper]);
-    setShowAddForm(false);
-    setNewResearch({
-      title: '',
-      authors: '',
-      abstract: '',
-      doi: '',
-      status: 'draft'
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/add-paper`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newResearch),
+        credentials: 'include'
+      });
+      console.log(newResearch);
+      
+     
+      
+     
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      else {
+        // Refresh the research papers list
+        const data = await response.json();
+        console.log(data);
+        
+        fetchResearchPapers();
+        setShowAddForm(false);
+        setNewResearch({
+          title: '',
+          authors: '',
+          abstract: '',
+          doi: '',
+          status: 'draft'
+        });
+      }
+    } catch (err) {
+      console.error("Error adding research paper:", err);
+      alert("Failed to add research paper. Please try again.");
+    }
   };
 
-  // Handle edit submission
-  const handleUpdateResearch = (e) => {
+  // Handle edit submission to update an existing research paper
+  const handleUpdateResearch = async (e) => {
     e.preventDefault();
-    const updatedResearch = research.map(paper => 
-      paper.paper_id === currentResearch.paper_id 
-        ? {...currentResearch, updated_at: new Date().toISOString().replace('T', ' ').substring(0, 19)} 
-        : paper
-    );
-    
-    setResearch(updatedResearch);
-    setShowEditModal(false);
-    setCurrentResearch(null);
+    try {
+      
+      const response = await axios.put(`${API_BASE_URL}/update-paper/${currentResearch.paper_id}`, currentResearch, {
+        headers: {
+          
+          'Content-Type': 'application/json'
+        },
+        "withCredentials": true
+      });
+      
+      if (response.data && response.data.success) {
+        // Refresh the research papers list
+        fetchResearchPapers();
+        setShowEditModal(false);
+        setCurrentResearch(null);
+      }
+    } catch (err) {
+      console.error("Error updating research paper:", err);
+      alert("Failed to update research paper. Please try again.");
+    }
   };
 
-  // Handle delete
-  const handleDeleteResearch = (id) => {
+  // Handle delete to remove a research paper
+  const handleDeleteResearch = async (id) => {
     if (window.confirm('Are you sure you want to delete this research?')) {
-      setResearch(research.filter(paper => paper.paper_id !== id));
+      try {
+        const token = sessionStorage.getItem('token');
+        const response = await axios.delete(`${API_BASE_URL}/delete-paper/${id}`, {
+          "withCredentials": true
+        });
+        
+        if (response.data) {
+          // Refresh the research papers list
+          fetchResearchPapers();
+        }
+      } catch (err) {
+        console.error("Error deleting research paper:", err);
+        alert("Failed to delete research paper. Please try again.");
+      }
     }
   };
 
@@ -220,8 +252,9 @@ export default function ResearchDashboard() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-indigo-600 p-4 text-white">
+      <Navbar/>
+       
+      <header className="bg-indigo-600 mt-20 p-4 text-white">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Research Dashboard</h1>
           <button 
@@ -310,14 +343,14 @@ export default function ResearchDashboard() {
         <main className="flex-1 p-6 overflow-auto">
           {/* Search Bar */}
           <div className="mb-6 flex justify-between">
-            <div className="relative w-1/2 ">
-              <div className="absolute inset-y-0 left-0  pl-3 flex items-center pointer-events-none">
+            <div className="relative w-1/2">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />
               </div>
               <input
                 type="text"
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="      Search by title, author, DOI..."
+                placeholder="       Search by title, author, DOI..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -395,7 +428,15 @@ export default function ResearchDashboard() {
               <p className="mt-1 text-sm text-gray-600">{filteredResearch.length} items found</p>
             </div>
             
-            {filteredResearch.length === 0 ? (
+            {isLoading ? (
+              <div className="p-6 text-center text-gray-500">
+                Loading research papers...
+              </div>
+            ) : error ? (
+              <div className="p-6 text-center text-red-500">
+                {error}
+              </div>
+            ) : filteredResearch.length === 0 ? (
               <div className="p-6 text-center text-gray-500">
                 No research papers found. Try changing your search criteria.
               </div>
@@ -668,10 +709,12 @@ export default function ResearchDashboard() {
                   <span className="font-medium text-gray-500">Paper ID:</span>
                   <span className="ml-2">{currentResearch.paper_id}</span>
                 </div>
-                <div>
-                  <span className="font-medium text-gray-500">User ID:</span>
-                  <span className="ml-2">{currentResearch.user_id}</span>
-                </div>
+                {currentResearch.user_id && (
+                  <div>
+                    <span className="font-medium text-gray-500">User ID:</span>
+                    <span className="ml-2">{currentResearch.user_id}</span>
+                  </div>
+                )}
               </div>
               
               <div className="mt-6 flex justify-end space-x-3">
@@ -691,7 +734,7 @@ export default function ResearchDashboard() {
                     handleEditResearch(currentResearch);
                   }}
                 >
-                  Edit
+                  Edit Research
                 </button>
               </div>
             </div>
@@ -754,7 +797,7 @@ export default function ResearchDashboard() {
                     name="abstract"
                     rows="4"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                    value={currentResearch.abstract || ""}
+                    value={currentResearch.abstract || ''}
                     onChange={handleEditChange}
                   ></textarea>
                 </div>
@@ -767,7 +810,7 @@ export default function ResearchDashboard() {
                     type="text"
                     name="doi"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                    value={currentResearch.doi || ""}
+                    value={currentResearch.doi || ''}
                     onChange={handleEditChange}
                   />
                 </div>

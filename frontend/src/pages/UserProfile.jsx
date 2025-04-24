@@ -1,20 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { User, Mail, Award, BookOpen, LogOut, Check, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
 export default function UserProfile() {
-  const [profile] = useState({
-    email: "ashes@gmail.com",
-    h_index: 0,
-    i10_index: 0,
-    id_card_url: null,
-    is_verified: false,
-    name: "ashes das",
-    role: "user",
-    scholar_id: null,
-    total_citations: 0
-  });
+  const [profile , setprofile] = useState();
+  useEffect(()=>{
+    const fetchUserData = async ()=>{
+      const resp = await fetch('https://riise.koyeb.app/api/v1/users/profile' , {
+        "credentials" : "include"
+      });
+      const data = await resp.json();
+      console.log(data);
+      setprofile(data.profile)
+    }
+
+    fetchUserData();
+  },[]);
 const navigate = useNavigate();
   const clearAllCookies = () => {
     // Get all cookies
@@ -82,8 +84,9 @@ const navigate = useNavigate();
 
 
   return (
-    <div><Navbar/>
-    <div className="max-w-md mx-auto bg-white rounded-xl justify-center mt-12 shadow-md overflow-hidden md:max-w-2xl">
+    <div className='h-screen bg-gradient-to-br from-indigo-100 to-purple-100'><Navbar/>
+    <div className="h-24"></div>
+    <div className="max-w-md mx-auto bg-white rounded-xl justify-center  shadow-md overflow-hidden md:max-w-2xl">
       <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-white">User Profile</h1>
@@ -97,7 +100,7 @@ const navigate = useNavigate();
         </div>
       </div>
       
-      <div className="p-6">
+     {profile &&  <div className="p-6">
         <div className="flex items-center mb-6">
           <div className="bg-blue-100 rounded-full p-4">
             <User size={32} className="text-blue-600" />
@@ -166,7 +169,7 @@ const navigate = useNavigate();
             </div>
           )}
         </div>
-      </div>
+      </div>}
     </div>
     </div>
   );
