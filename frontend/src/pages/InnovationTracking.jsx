@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchInnovations, fetchDashboardSummary, deleteInnovation } from '../api/innovationService';
 import DashboardSummary from '../components/DashboardSummary';
 import InnovationForm from '../components/InnovationForm'; 
-import '../styles/Innovation.css'; // Assuming you have a CSS file for styling 
+
 import Navbar from '../components/Navbar';
 const Innovation = () => {
   const [innovations, setInnovations] = useState([]);
