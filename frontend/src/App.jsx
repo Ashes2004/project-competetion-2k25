@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import StartupHub from "./pages/StartupHub";
 import AuthToggler from "./pages/Auth";
 import Research from "./pages/Research";
-
+import Innovation from "./pages/InnovationTracking";
 import ResearchForm from "./pages/ResearchForm";
 import IPRDashboard from "./pages/IPR"
 
