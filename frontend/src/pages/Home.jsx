@@ -104,7 +104,7 @@ const Home = () => {
                 <div className="text-3xl md:text-4xl font-bold text-blue-800">
                   {index === 0 ? `${animatedCount}+` : stat.number}
                 </div>
-                <div className="text-gray-600 font-medium mb-12">{stat.description}</div>
+                <div className="text-gray-600 font-medium mb-20">{stat.description}</div>
               </div>
             ))}
           </div>
