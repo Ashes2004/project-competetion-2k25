@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, User } from "lucide-react";
 import axios from "axios";
 
-const Navbar = () => {
+const Homenav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,15 +14,70 @@ const Navbar = () => {
     setIsLoggedIn(!!userEmail);
   }, []);
 
+  const clearAllCookies = () => {
+    // Get all cookies
+    const cookies = document.cookie.split(';');
+    
+    // Get the current domain
+    const domain = window.location.hostname;
+    
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i];
+      const eqPos = cookie.indexOf('=');
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      
+      if (name) {
+        // Clear with multiple combinations of path and domain to ensure complete removal
+        // Root path
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+        
+        // With domain
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${domain};`;
+        
+        // For subdomains
+        if (domain.indexOf('.') !== -1) {
+          const rootDomain = domain.substring(domain.indexOf('.'));
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${rootDomain};`;
+        }
+        
+        // Various paths that might be used
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/api/;`;
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/auth/;`;
+      }
+    }
+  };
+
   const handleLogout = async () => {
     try {
-      await axios.post("https://riise.koyeb.app/api/v1/users/logout");
+      // Configure axios to include credentials (cookies)
+      const response = await axios.post("https://riise.koyeb.app/api/v1/users/logout", {}, {
+        withCredentials: true // This ensures cookies are sent with the request
+      });
+      
+      // Clear client-side storage
       sessionStorage.removeItem("userEmail");
+      sessionStorage.clear();
+      localStorage.clear(); // Also clear localStorage in case anything is stored there
+      
+      // Clear cookies that are accessible via JavaScript
+      clearAllCookies();
+      
       setIsLoggedIn(false);
       setShowPopup(false);
       navigate("/");
+      
+      console.log("Logout successful:", response.data);
     } catch (error) {
       console.error("Logout failed:", error);
+      
+      // Even if the API call fails, still clear client-side data
+      sessionStorage.clear();
+      localStorage.clear();
+      clearAllCookies();
+      
+      setIsLoggedIn(false);
+      setShowPopup(false);
+      navigate("/");
     }
   };
 
@@ -148,4 +203,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default Homenav;

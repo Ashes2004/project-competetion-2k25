@@ -1,12 +1,13 @@
 import React from "react";
-import Navbar from "../components/Navbar";
+
 import Footer from "../components/Footer";
 import "./Home.css";
+import Homenav from "../components/Homenav";
 const Home = () => {
   return (
     <div className="min-w-screen">
       <div className="hero pb-16">
-        <Navbar />
+        <Homenav />
 
         <section className="py-20  rounded-lg  mb-8">
           <div className="container mx-auto px-4 text-center">
