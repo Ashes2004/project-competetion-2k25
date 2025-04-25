@@ -11,6 +11,7 @@ import IPRApplicationGuide from "./pages/IPRGuide";
 import ResearchPaperAdmin from "./pages/ReserachDashboard";
 import Aboutus from "./pages/Aboutus";
 import UserProfile from "./pages/UserProfile";
+import ResearchMedia from "./pages/ResearchMedia";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
         <Route path="/startups/:startupId" element={<StartupHub />} />
 
         <Route path="/research" element = {<Research/>}/>
+        <Route path="/research/find" element = {<ResearchMedia/>}/>
         <Route path="/research/dashboard" element = {<ResearchPaperAdmin/>}/>
         <Route path="/research/form" element={<ResearchForm/>} />
         <Route path="/user/profile" element={<UserProfile/>} />

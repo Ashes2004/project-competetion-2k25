@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, FileText, BarChart2, PieChart, ListFilter, Trash2, Edit, Eye, Download, X } from 'lucide-react';
+import { Search, Plus, FileText, BarChart2, PieChart, ListFilter, Trash2, Edit, Eye, Download, X, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // Make sure to install axios: npm install axios
 import Navbar from '../components/Navbar';
@@ -418,6 +418,13 @@ export default function ResearchDashboard() {
               >
                 <Download size={18} />
                 Export
+              </button>
+              <button 
+                className="inline-flex items-center gap-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50"
+                onClick={()=>{navigate('/research/find')}}
+              >
+                <Star size={18} />
+                Explore More
               </button>
             </div>
           </div>

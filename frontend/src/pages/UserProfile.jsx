@@ -7,12 +7,22 @@ import {
   LogOut,
   Check,
   AlertCircle,
+  X,
+  Plus,
+  RefreshCw
 } from "lucide-react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
+
+
 export default function UserProfile() {
-  const [profile, setprofile] = useState();
+  const [profile, setProfile] = useState();
+  const [showModal, setShowModal] = useState(false);
+  const [scholarId, setScholarId] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     const fetchUserData = async () => {
       const resp = await fetch("https://riise.koyeb.app/api/v1/users/profile", {
@@ -20,12 +30,17 @@ export default function UserProfile() {
       });
       const data = await resp.json();
       console.log(data);
-      setprofile(data.profile);
+      setProfile(data.profile);
+      if (data.profile.scholar_id) {
+        setScholarId(data.profile.scholar_id);
+      }
     };
 
     fetchUserData();
   }, []);
+
   const navigate = useNavigate();
+
   const clearAllCookies = () => {
     // Get all cookies
     const cookies = document.cookie.split(";");
@@ -39,7 +54,6 @@ export default function UserProfile() {
       const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
 
       if (name) {
-       
         // Root path
         document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
 
@@ -58,12 +72,12 @@ export default function UserProfile() {
       }
     }
   };
+
   const handleLogout = async () => {
     try {
       // Configure axios to include credentials (cookies)
       const response = await axios.post(
         "https://riise.koyeb.app/api/v1/users/logout",
-        
         {
           withCredentials: true, // This ensures cookies are sent with the request
         }
@@ -92,11 +106,71 @@ export default function UserProfile() {
     }
   };
 
+
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setError("");
+  };
+
+  const handleScholarIdChange = (e) => {
+    setScholarId(e.target.value);
+  };
+
+  const handleSubmit = async () => {
+    // Validate scholar ID (basic validation)
+    if (!scholarId.trim()) {
+      setError("Scholar ID cannot be empty");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setError("");
+    
+    try {
+      
+      // Implement the API call to update or add the scholar ID
+      console.log("scholerid : ", scholarId);
+     
+      const response = await axios.put(
+        "https://riise.koyeb.app/api/v1/users/update_profile",
+        { scholar_id: scholarId },
+        { withCredentials: true }
+      );
+      
+      // Update the profile state with the new scholar ID
+      setProfile(prev => ({
+        ...prev,
+        scholar_id: scholarId
+      }));
+      
+      // Close the modal
+      closeModal();
+     
+      // You might want to fetch updated stats after changing scholar ID
+      const updatedProfile = await fetch("https://riise.koyeb.app/api/v1/users/profile", {
+        credentials: "include",
+      });
+      const data = await updatedProfile.json();
+      setProfile(data.profile);
+    } catch (error) {
+      console.error("Failed to update Scholar ID:", error);
+      setError(error.response?.data?.message || "Failed to update Scholar ID");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+
+
   return (
     <div className="h-screen bg-gradient-to-br from-indigo-100 to-purple-100">
       <Navbar />
       <div className="h-24"></div>
-      <div className="max-w-md mx-auto bg-white rounded-xl justify-center  shadow-md overflow-hidden md:max-w-2xl">
+      <div className="max-w-md mx-auto bg-white rounded-xl justify-center shadow-md overflow-hidden md:max-w-2xl">
         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold text-white">User Profile</h1>
@@ -177,7 +251,7 @@ export default function UserProfile() {
               </div>
               <div className="flex flex-row gap-x-4">
                 {profile.scholar_id ? (
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="bg-gray-50 p-4 rounded-lg w-2/3">
                     <div className="flex items-center text-gray-500 text-sm mb-1">
                       Scholar ID
                     </div>
@@ -193,17 +267,19 @@ export default function UserProfile() {
 
                 {profile.scholar_id ? (
                   <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-1 bg-green-700 w-1/3 text-blue-100 px-3 py-1 rounded-md text-sm font-semibold hover:bg-blue-50"
+                    onClick={openModal}
+                    className="flex flex-col items-center justify-center gap-2 bg-indigo-600 w-1/3 text-white px-3 py-3 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors duration-200 shadow-md"
                   >
-                    <h2 className="text-center text-md"> Add ID</h2>
+                    <RefreshCw size={20} className="animate-pulse" />
+                    <span>Update ID</span>
                   </button>
                 ) : (
                   <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-1 bg-green-700 w-1/3 text-blue-100 px-3 py-1 rounded-md text-sm font-semibold hover:bg-blue-50"
+                    onClick={openModal}
+                    className="flex flex-col items-center justify-center gap-2 bg-blue-600 w-1/3 text-white px-3 py-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200 shadow-md"
                   >
-                    <h2 className="text-center text-md"> Update ID</h2>
+                    <Plus size={20} />
+                    <span>Add ID</span>
                   </button>
                 )}
               </div>
@@ -211,6 +287,64 @@ export default function UserProfile() {
           </div>
         )}
       </div>
+
+      {/* Modal for adding/updating Scholar ID */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96 max-w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {profile?.scholar_id ? "Update Scholar ID" : "Add Scholar ID"}
+              </h3>
+              <button
+                onClick={closeModal}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <label htmlFor="scholarId" className="block text-sm font-medium text-gray-700 mb-1">
+                Google Scholar ID
+              </label>
+              <input
+                type="text"
+                id="scholarId"
+                value={scholarId}
+                onChange={handleScholarIdChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your Scholar ID"
+              />
+              {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${
+                  isSubmitting
+                    ? "bg-blue-400"
+                    : "bg-blue-600 hover:bg-blue-700"
+                } transition-colors duration-200`}
+              >
+                {isSubmitting
+                  ? "Saving..."
+                  : profile?.scholar_id
+                  ? "Update"
+                  : "Add"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
