@@ -12,6 +12,7 @@ import ResearchPaperAdmin from "./pages/ReserachDashboard";
 import Aboutus from "./pages/Aboutus";
 import UserProfile from "./pages/UserProfile";
 import ResearchMedia from "./pages/ResearchMedia";
+import RIISEBot from "./pages/RiiseBot";
 
 
 function App() {
@@ -23,7 +24,7 @@ function App() {
         <Route path="/ipr/guide" element = {<IPRApplicationGuide/>}/>
         <Route path="/auth" element={<AuthToggler />} />
         <Route path="/ipr" element={<IPRDashboard />} />
-        
+        <Route path="/riisebot" element={<RIISEBot />} />
         <Route path="/innovations" element={< Innovation/>} />
         <Route path="/about" element={< Aboutus/>} />
         

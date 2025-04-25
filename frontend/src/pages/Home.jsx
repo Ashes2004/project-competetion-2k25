@@ -3,6 +3,7 @@ import Footer from "../components/Footer";
 import { ChevronRight, Star, Zap, Briefcase, BookOpen } from "lucide-react";
 import "./Home.css";
 import HomeNav from "../components/HomeNav";
+import RIISEBotWidget from "./RiiseBot";
 
 const Home = () => {
   const [animatedCount, setAnimatedCount] = useState(0);
@@ -263,7 +264,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-
+      <RIISEBotWidget position="bottom-right" />
       <Footer />
     </div>
   );
