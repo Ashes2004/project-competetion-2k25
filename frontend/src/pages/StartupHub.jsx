@@ -10,6 +10,7 @@ import {
   Eye,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import RIISEBotWidget from "./RiiseBot";
 
 
 const API_BASE_URL = "https://riise.koyeb.app";
@@ -766,6 +767,7 @@ function StartupHub() {
         onClose={() => setStartupToView(null)}
         startup={startupToView}
       />
+       <RIISEBotWidget position="bottom-right" />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import DashboardSummary from '../components/DashboardSummary';
 import InnovationForm from '../components/InnovationForm'; 
 import './innovation.css'; 
 import Navbar from '../components/Navbar';
+import RIISEBotWidget from './RiiseBot';
 const Innovation = () => {
   const [innovations, setInnovations] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -306,6 +307,7 @@ const Innovation = () => {
         </div>
       )}
     </div>
+    <RIISEBotWidget position="bottom-right" />
     </div>
   );
 };

@@ -10,6 +10,7 @@ import {
   Square,
   ChevronDown  // Add this for the ExpandMore functionality
 } from 'lucide-react';
+import RIISEBotWidget from './RiiseBot';
 
 export default function IPRApplicationGuide() {
   const [activeStep, setActiveStep] = useState(0);
@@ -552,7 +553,7 @@ export default function IPRApplicationGuide() {
           </div>
         </div>
       </main>
-      
+      <RIISEBotWidget position="bottom-right" />
       <footer className="bg-gray-800 text-white py-8 px-6 mt-12">
         <div className="max-w-4xl mx-auto text-center">
           <p className="opacity-80">

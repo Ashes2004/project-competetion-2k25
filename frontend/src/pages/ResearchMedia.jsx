@@ -3,6 +3,7 @@ import { Chart, registerables } from 'chart.js';
 import { Search, User, BookOpen, FileText, Award, Download, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import RIISEBotWidget from './RiiseBot';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -527,7 +528,7 @@ export default function ResearchMedia() {
           </div>
         )}
       </main>
-
+      <RIISEBotWidget position="bottom-right" />
      <Footer/>
     </div>
   );

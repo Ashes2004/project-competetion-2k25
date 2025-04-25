@@ -3,6 +3,7 @@ import { Search, Plus, FileText, BarChart2, PieChart, ListFilter, Trash2, Edit, 
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // Make sure to install axios: npm install axios
 import Navbar from '../components/Navbar';
+import RIISEBotWidget from './RiiseBot';
 
 export default function ResearchDashboard() {
   const navigate = useNavigate();
@@ -753,7 +754,7 @@ export default function ResearchDashboard() {
           </div>
         </div>
       )}
-
+       <RIISEBotWidget position="bottom-right" />
       {/* Edit Research Modal */}
       {showEditModal && currentResearch && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -864,6 +865,7 @@ export default function ResearchDashboard() {
               </div>
             </form>
           </div>
+         
         </div>
       )}
     </div>

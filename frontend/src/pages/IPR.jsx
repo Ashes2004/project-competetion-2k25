@@ -3,6 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, 
 import { Calendar, FileText, Plus, Search, TrendingUp, Users, Award, Filter, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import RIISEBotWidget from './RiiseBot';
 
 // Mock data for demonstration
 const mockIprData = [
@@ -294,6 +295,7 @@ function Dashboard({
           </table>
         </div>
       </div>
+      <RIISEBotWidget position="bottom-right" />
     </div>
   );
 }
