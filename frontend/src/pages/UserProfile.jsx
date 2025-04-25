@@ -44,33 +44,32 @@ export default function UserProfile() {
   const clearAllCookies = () => {
     // Get all cookies
     const cookies = document.cookie.split(";");
-
-    // Get the current domain
-    const domain = window.location.hostname;
-
+    
+    // General cookie clearing logic as before
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i];
       const eqPos = cookie.indexOf("=");
       const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-
+      
       if (name) {
-        // Root path
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
-
-        // With domain
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${domain};`;
-
-        // For subdomains
-        if (domain.indexOf(".") !== -1) {
-          const rootDomain = domain.substring(domain.indexOf("."));
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${rootDomain};`;
-        }
-
-        // Various paths that might be used
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/api/;`;
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/auth/;`;
+        // Basic cookie deletion
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/Cookies;`;
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/Cookies; domain=${window.location.hostname};`;
       }
     }
+    
+    // Specifically target the access_token with the exact domain
+    document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/Cookies; domain=riise.koyeb.app;";
+    document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/Cookies; domain=.riise.koyeb.app;";
+    
+    // Try with secure flag variations
+    document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/Cookies; domain=riise.koyeb.app; secure;";
+    document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/Cookies; domain=.riise.koyeb.app; secure;";
+    
+    // Try with SameSite variations
+    document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=riise.koyeb.app; SameSite=None; secure;";
+    document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/Cookies; domain=riise.koyeb.app; SameSite=Lax;";
+    document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/Cookies; domain=riise.koyeb.app; SameSite=Strict;";
   };
 
   const handleLogout = async () => {
