@@ -78,6 +78,7 @@ export default function UserProfile() {
       // Configure axios to include credentials (cookies)
       const response = await axios.post(
         "https://riise.koyeb.app/api/v1/users/logout",
+        {},
         {
           withCredentials: true, // This ensures cookies are sent with the request
         }
