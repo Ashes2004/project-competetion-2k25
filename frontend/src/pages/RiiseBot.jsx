@@ -56,7 +56,7 @@ const RIISEBotWidget = ({ position = 'bottom-right' }) => {
 
     try {
       // API call
-      const response = await fetch('http://localhost:3000/api/ai', {
+      const response = await fetch('https://riise-buddy.vercel.app/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage })
