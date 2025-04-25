@@ -1,1 +1,1 @@
-﻿# project-competetion-2k2
+﻿# project-competetion-2k25
