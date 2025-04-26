@@ -15,7 +15,8 @@ import {
   Briefcase,
   Zap,
   Shield,
-  Download
+  Download,
+  User2Icon
 } from "lucide-react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
@@ -304,12 +305,19 @@ export default function UserProfile() {
             <h1 className="text-xl font-bold text-white">User Profile</h1>
 
             <div className="flex gap-2">
-            {profile && profile.role === 'admin' &&  <button
+            {profile && profile.role === 'admin' && profile.is_verified == false &&  <button
                 onClick={openAdminModal}
                 className="flex items-center gap-1 bg-amber-500 text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors"
               >
                 <Shield size={16} />
                 Admin Verification
+              </button>}
+              {profile && profile.role === 'admin' && profile.is_verified == true &&  <button
+                onClick={() => navigate("/user/data")}
+                className="flex items-center gap-1 bg-amber-500 text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors"
+              >
+                <User2Icon size={16} />
+                Users Data
               </button>}
               <button
                 onClick={handleLogout}
@@ -376,7 +384,7 @@ export default function UserProfile() {
               <div className="mb-6">
                 <h3 className="text-lg font-medium text-gray-700 mb-3 flex items-center">
                   <Award size={18} className="mr-2 text-indigo-600" />
-                  Academic Metrics
+                  Research Metrics
                 </h3>
                 <div className="grid grid-cols-3 gap-4">
                   <StatCard 
@@ -541,75 +549,76 @@ export default function UserProfile() {
         </div>
       )}
 
-      {/* Modal for Admin Mode */}
-      {showAdminModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96 max-w-full mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                <Shield size={20} className="mr-2 text-amber-500" />
-                Admin Authentication
-              </h3>
-              <button
-                onClick={closeAdminModal}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="mb-4">
-              <label htmlFor="secretKey" className="block text-sm font-medium text-gray-700 mb-1">
-                Secret Key
-              </label>
-              <input
-                type="password"
-                id="secretKey"
-                value={secretKey}
-                onChange={handleSecretKeyChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
-                placeholder="Enter administrator secret key"
-              />
-              {adminError && <p className="mt-2 text-sm text-red-600">{adminError}</p>}
-              {adminSuccess && (
-                <div className="mt-2 p-2 bg-green-100 border border-green-300 text-green-700 rounded-md flex items-center">
-                  <Check size={16} className="mr-1" />
-                  Admin access granted! Updating role...
-                </div>
-              )}
-            </div>
-            
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={closeAdminModal}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAdminSubmit}
-                disabled={isSubmitting || adminSuccess}
-                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${
-                  isSubmitting || adminSuccess
-                    ? "bg-amber-400"
-                    : "bg-amber-500 hover:bg-amber-600"
-                } transition-colors duration-200 flex items-center`}
-              >
-                {isSubmitting ? (
-                  <>Verifying...</>
-                ) : adminSuccess ? (
-                  <>
-                    <Check size={16} className="mr-1" />
-                    Success
-                  </>
-                ) : (
-                  <>Verify</>
-                )}
-              </button>
-            </div>
+     {/* Modal for Admin Mode */}
+{/* Modal for Admin Mode */}
+{showAdminModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-md flex items-center justify-center z-50">
+    <div className="bg-white bg-opacity-70 backdrop-blur-lg rounded-lg shadow-lg p-6 w-96 max-w-full mx-4 border border-white border-opacity-20">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+          <Shield size={20} className="mr-2 text-amber-500" />
+          Admin Authentication
+        </h3>
+        <button
+          onClick={closeAdminModal}
+          className="text-gray-500 hover:text-gray-700"
+        >
+          <X size={20} />
+        </button>
+      </div>
+      
+      <div className="mb-4">
+        <label htmlFor="secretKey" className="block text-sm font-medium text-gray-700 mb-1">
+          Secret Key
+        </label>
+        <input
+          type="password"
+          id="secretKey"
+          value={secretKey}
+          onChange={handleSecretKeyChange}
+          className="w-full px-3 py-2 bg-white bg-opacity-50 backdrop-blur-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+          placeholder="Enter administrator secret key"
+        />
+        {adminError && <p className="mt-2 text-sm text-red-600">{adminError}</p>}
+        {adminSuccess && (
+          <div className="mt-2 p-2 bg-green-100 bg-opacity-70 backdrop-blur-sm border border-green-200 text-green-700 rounded-md flex items-center">
+            <Check size={16} className="mr-1" />
+            Admin access granted! Updating role...
           </div>
-        </div>
-      )}
+        )}
+      </div>
+      
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={closeAdminModal}
+          className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 bg-opacity-50 backdrop-blur-sm rounded-md hover:bg-gray-200"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleAdminSubmit}
+          disabled={isSubmitting || adminSuccess}
+          className={`px-4 py-2 text-sm font-medium text-white rounded-md ${
+            isSubmitting || adminSuccess
+              ? "bg-amber-400"
+              : "bg-amber-500 hover:bg-amber-600"
+          } transition-colors duration-200 flex items-center`}
+        >
+          {isSubmitting ? (
+            <>Verifying...</>
+          ) : adminSuccess ? (
+            <>
+              <Check size={16} className="mr-1" />
+              Success
+            </>
+          ) : (
+            <>Verify</>
+          )}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

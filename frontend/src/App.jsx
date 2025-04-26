@@ -13,6 +13,7 @@ import Aboutus from "./pages/Aboutus";
 import UserProfile from "./pages/UserProfile";
 import ResearchMedia from "./pages/ResearchMedia";
 import RIISEBot from "./pages/RiiseBot";
+import UserData from "./pages/UserData";
 
 
 function App() {
@@ -27,7 +28,7 @@ function App() {
         <Route path="/riisebot" element={<RIISEBot />} />
         <Route path="/innovations" element={< Innovation/>} />
         <Route path="/about" element={< Aboutus/>} />
-        
+        <Route path="/user/data" element={< UserData/>} />
         <Route path="/startups" element={<StartupHub />} />
         <Route path="/startups/:startupId" element={<StartupHub />} />
 
