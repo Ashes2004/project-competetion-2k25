@@ -9,6 +9,7 @@ const AuthToggler = () => {
     name: "",
     email: "",
     password: "",
+    isAdmin: false,
   });
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,11 +22,13 @@ const AuthToggler = () => {
       name: "",
       email: "",
       password: "",
+      isAdmin: false,
     });
   };
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    setFormData((prev) => ({ ...prev, [e.target.name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -46,7 +49,7 @@ const AuthToggler = () => {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          role: "user",
+          role: formData.isAdmin ? "admin" : "user",
         };
 
     try {
@@ -117,7 +120,7 @@ const AuthToggler = () => {
                       value={formData.name}
                       onChange={handleChange}
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                      placeholder="      John Doe"
+                      placeholder="     John Doe"
                       required
                     />
                   </div>
@@ -185,6 +188,23 @@ const AuthToggler = () => {
                   </button>
                 </div>
               </div>
+
+              {/* Admin Checkbox - Only visible during signup */}
+              {!isSignIn && (
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="isAdmin"
+                    name="isAdmin"
+                    checked={formData.isAdmin}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="isAdmin" className="ml-2 block text-sm text-gray-700">
+                    Sign up as admin?
+                  </label>
+                </div>
+              )}
 
               <button
                 type="submit"
