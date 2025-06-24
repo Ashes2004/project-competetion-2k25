@@ -13,7 +13,7 @@ export default function Aboutus() {
       bio: "A passionate backend developer and problem solver, Atul ensures smooth database integration and efficient server-side logic for our project.",
     },
     {
-      name: "Ashes",
+      name: "Ashes Das",
       role: "Frontend Developer",
       bio: "Ashes is a creative frontend enthusiast who focuses on building user-friendly and responsive interfaces using modern web technologies.",
     },
