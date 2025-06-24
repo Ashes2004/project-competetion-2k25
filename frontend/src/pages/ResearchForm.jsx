@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
-const API_BASE = "https://riise.koyeb.app/api/v1/research";
+const API_BASE = "https://riise-cx0q.onrender.com/api/v1/research";
 
 const ResearchForm = () => {
   const [searchParams] = useSearchParams();

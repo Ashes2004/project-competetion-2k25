@@ -37,7 +37,7 @@ export default function UserProfile() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const resp = await fetch("https://riise.koyeb.app/api/v1/users/profile", {
+      const resp = await fetch("https://riise-cx0q.onrender.com/api/v1/users/profile", {
         credentials: "include",
       });
       const data = await resp.json();
@@ -88,7 +88,7 @@ export default function UserProfile() {
     try {
       // Configure axios to include credentials (cookies)
       const response = await axios.post(
-        "https://riise.koyeb.app/api/v1/users/logout",
+        "https://riise-cx0q.onrender.com/api/v1/users/logout",
         {},
         {
           withCredentials: true, // This ensures cookies are sent with the request
@@ -124,7 +124,7 @@ export default function UserProfile() {
       
       // Make the GET request to the export endpoint
       const response = await axios.get(
-        "https://riise.koyeb.app/api/v1/export/user",
+        "https://riise-cx0q.onrender.com/api/v1/export/user",
         {
           withCredentials: true,
           responseType: 'blob', // Important for handling file downloads
@@ -195,7 +195,7 @@ export default function UserProfile() {
       console.log("scholerid : ", scholarId);
      
       const response = await axios.put(
-        "https://riise.koyeb.app/api/v1/users/update_profile",
+        "https://riise-cx0q.onrender.com/api/v1/users/update_profile",
         { scholar_id: scholarId },
         { withCredentials: true }
       );
@@ -210,7 +210,7 @@ export default function UserProfile() {
       closeModal();
      
       // You might want to fetch updated stats after changing scholar ID
-      const updatedProfile = await fetch("https://riise.koyeb.app/api/v1/users/profile", {
+      const updatedProfile = await fetch("https://riise-cx0q.onrender.com/api/v1/users/profile", {
         credentials: "include",
       });
       const data = await updatedProfile.json();
@@ -239,7 +239,7 @@ export default function UserProfile() {
       if (secretKey === "S3cREt") {
         // Make API call to update user role to admin
         const response = await axios.put(
-          "https://riise.koyeb.app/api/v1/users/update_profile",
+          "https://riise-cx0q.onrender.com/api/v1/users/update_profile",
           { role: "admin" },
           { withCredentials: true }
         );
@@ -253,7 +253,7 @@ export default function UserProfile() {
         setAdminSuccess(true);
         
         // Fetch updated profile info
-        const updatedProfile = await fetch("https://riise.koyeb.app/api/v1/users/profile", {
+        const updatedProfile = await fetch("https://riise-cx0q.onrender.com/api/v1/users/profile", {
           credentials: "include",
         });
         const data = await updatedProfile.json();

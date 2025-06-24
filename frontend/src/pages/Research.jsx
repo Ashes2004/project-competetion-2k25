@@ -7,7 +7,7 @@ import RIISEBotWidget from './RiiseBot';
 
 export default function ResearchDashboard() {
   const navigate = useNavigate();
-  const API_BASE_URL = 'https://riise.koyeb.app/api/v1/research';
+  const API_BASE_URL = 'https://riise-cx0q.onrender.com/api/v1/research';
 
   useEffect(() => {
     const userEmail = sessionStorage.getItem('userEmail');  
