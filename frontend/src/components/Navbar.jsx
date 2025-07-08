@@ -52,7 +52,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post("https://riise-cx0q.onrender.com/api/v1/users/logout", {}, {
+      const response = await axios.post("http://riise.onrender.com/api/v1/users/logout", {}, {
         withCredentials: true
       });
       

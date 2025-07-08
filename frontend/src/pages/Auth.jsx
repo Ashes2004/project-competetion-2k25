@@ -36,8 +36,8 @@ const AuthToggler = () => {
     setMessage("");
 
     const url = isSignIn
-      ? "https://riise-cx0q.onrender.com/api/v1/users/login"
-      : "https://riise-cx0q.onrender.com/api/v1/users/signup";
+      ? "http://riise.onrender.com/api/v1/users/login"
+      : "http://riise.onrender.com/api/v1/users/signup";
 
     const payload = isSignIn
       ? {

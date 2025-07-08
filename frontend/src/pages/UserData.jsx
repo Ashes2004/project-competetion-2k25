@@ -16,7 +16,7 @@ export default function UserData() {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://riise-cx0q.onrender.com/api/v1/users/all-profile' , {credentials: 'include'});
+        const response = await fetch('http://riise.onrender.com/api/v1/users/all-profile' , {credentials: 'include'});
         if (!response.ok) {
           throw new Error('Failed to fetch users');
         }
@@ -55,7 +55,7 @@ export default function UserData() {
       setExportingUserId(userId);
       console.log("bwvfjwb", userEmail);
       
-      const response = await fetch(`https://riise-cx0q.onrender.com/api/v1/export/admin/user/${userEmail}`, {
+      const response = await fetch(`http://riise.onrender.com/api/v1/export/admin/user/${userEmail}`, {
         credentials: 'include'
       });
       

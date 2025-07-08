@@ -52,7 +52,7 @@ const HomeNav = () => {
   const handleLogout = async () => {
     try {
       // Configure axios to include credentials (cookies)
-      const response = await axios.post("https://riise-cx0q.onrender.com/api/v1/users/logout", {}, {
+      const response = await axios.post("https://riise.onrender.com/api/v1/users/logout", {}, {
         withCredentials: true // This ensures cookies are sent with the request
       });
       

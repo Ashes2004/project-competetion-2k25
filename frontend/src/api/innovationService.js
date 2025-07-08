@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://riise.koyeb.app/api/v1';
+const API_BASE_URL = 'http://riise.onrender.com/api/v1';
 
 export const fetchInnovations = async (filters = {}) => {
   const queryParams = new URLSearchParams();

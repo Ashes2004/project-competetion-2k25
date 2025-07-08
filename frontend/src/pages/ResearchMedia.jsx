@@ -31,9 +31,9 @@ export default function ResearchMedia() {
     try {
       let url;
       if (searchType === 'id') {
-        url = `https://riise-cx0q.onrender.com/api/v1/research/fetch-by-id/${encodeURIComponent(searchQuery)}`;
+        url = `http://riise.onrender.com/api/v1/research/fetch-by-id/${encodeURIComponent(searchQuery)}`;
       } else {
-        url = `https://riise-cx0q.onrender.com/api/v1/research/fetch-by-name?name=${encodeURIComponent(searchQuery)}`;
+        url = `http://riise.onrender.com/api/v1/research/fetch-by-name?name=${encodeURIComponent(searchQuery)}`;
       }
       
       const response = await fetch(url , {"credentials":"include"});

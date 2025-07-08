@@ -13,7 +13,7 @@ import Navbar from "../components/Navbar";
 import RIISEBotWidget from "./RiiseBot";
 
 
-const API_BASE_URL = "https://riise-cx0q.onrender.com/";
+const API_BASE_URL = "http://riise.onrender.com";
 
 const fetchStartups = async () => {
   try {
